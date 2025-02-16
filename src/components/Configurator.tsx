@@ -4,7 +4,7 @@ import React, { Suspense, useState, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows, ACESFilmicToneMapping } from '@react-three/drei'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Camera, Palette, Car } from 'lucide-react'
+import { Camera, Palette, Car, SunDim } from 'lucide-react'
 import * as THREE from 'three'
 import CarModel from './CarModel'
 import Dropdown from './Dropdown'
@@ -42,6 +42,15 @@ const drlColors = [
   { name: 'Green', hex: '#00FF00' },
 ]
 
+const environmentPresets = [
+  { name: 'Studio', value: 'studio' },
+  { name: 'Sunset', value: 'sunset' },
+  { name: 'Dawn', value: 'dawn' },
+  { name: 'Night', value: 'night' },
+  { name: 'Warehouse', value: 'warehouse' },
+  { name: 'City', value: 'city' },
+] as const;
+
 export default function Configurator() {
   const [selectedBrand, setSelectedBrand] = useState(carBrands[0])
   const [selectedModel, setSelectedModel] = useState(carModels[carBrands[0]][0])
@@ -60,6 +69,7 @@ export default function Configurator() {
   const [interiorSecondaryColor, setInteriorSecondaryColor] = useState<string | null>(null)
   const [showConfigurator, setShowConfigurator] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
+  const [selectedEnvironment, setSelectedEnvironment] = useState<typeof environmentPresets[number]['value']>('warehouse')
 
   useEffect(() => {
     const checkMobile = () => {
@@ -149,7 +159,7 @@ export default function Configurator() {
                 setOriginalColors={setOriginalColors}
               />
               <Environment 
-                preset="warehouse"
+                preset={selectedEnvironment}
                 background={false}
               />
               <ContactShadows 
@@ -228,6 +238,38 @@ export default function Configurator() {
                   >
                     <Palette size={20} />
                   </button>
+                </div>
+
+                {/* Environment Selector */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-white">
+                    <span className="text-sm flex items-center gap-2">
+                      <SunDim size={16} />
+                      Umgebungslicht
+                    </span>
+                  </div>
+                  <select
+                    value={selectedEnvironment}
+                    onChange={(e) => setSelectedEnvironment(e.target.value as typeof selectedEnvironment)}
+                    className="w-full bg-gray-800 text-white text-sm py-1 px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/20 border border-white/10"
+                    style={{
+                      background: '#1a1a1a',
+                      colorScheme: 'dark'
+                    }}
+                  >
+                    {environmentPresets.map((preset) => (
+                      <option 
+                        key={preset.value} 
+                        value={preset.value}
+                        style={{
+                          background: '#1a1a1a',
+                          color: '#ffffff'
+                        }}
+                      >
+                        {preset.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <ConfigSection title="Body" icon={Car}>

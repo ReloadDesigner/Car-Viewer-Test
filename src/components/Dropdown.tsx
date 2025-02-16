@@ -17,10 +17,21 @@ export default function Dropdown({ options, value, onChange, label, className }:
       <select
         value={value}
         onChange={onChange}
-        className={`appearance-none bg-white bg-opacity-10 text-white py-2 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-opacity-20 transition-all duration-200 ${className || ''}`}
+        className={`appearance-none bg-gray-800 text-white py-2 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:ring-2 focus:ring-white/20 border border-white/10 ${className || ''}`}
+        style={{
+          background: '#1a1a1a',
+          colorScheme: 'dark'
+        }}
       >
         {options.map((option) => (
-          <option key={option} value={option}>
+          <option 
+            key={option} 
+            value={option}
+            style={{
+              background: '#1a1a1a',
+              color: '#ffffff'
+            }}
+          >
             {option}
           </option>
         ))}
