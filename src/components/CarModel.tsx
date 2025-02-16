@@ -22,26 +22,39 @@ interface CarModelProps {
   }) => void;
 }
 
-const glowVertexShader = `
+const drlVertexShader = `
+  varying vec2 vUv;
   varying vec3 vNormal;
-  varying vec3 vPositionNormal;
-  void main() 
-  {
-    vNormal = normalize( normalMatrix * normal );
-    vPositionNormal = normalize( ( modelViewMatrix * vec4( position, 1.0 ) ).xyz );
-    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+  varying vec3 vViewPosition;
+
+  void main() {
+    vUv = uv;
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    vViewPosition = -mvPosition.xyz;
+    vNormal = normalMatrix * normal;
+    gl_Position = projectionMatrix * mvPosition;
   }
 `
 
-const glowFragmentShader = `
-  uniform vec3 glowColor;
-  uniform float intensity;
+const drlFragmentShader = `
+  uniform vec3 baseColor;
+  uniform float glowIntensity;
+  varying vec2 vUv;
   varying vec3 vNormal;
-  varying vec3 vPositionNormal;
-  void main() 
-  {
-    float a = pow( 0.7 - dot( vNormal, vPositionNormal ), 4.0 );
-    gl_FragColor = vec4( glowColor, min(a * intensity, 1.0) );
+  varying vec3 vViewPosition;
+
+  void main() {
+    vec3 normal = normalize(vNormal);
+    vec3 viewDir = normalize(vViewPosition);
+    float fresnel = pow(1.0 - abs(dot(normal, viewDir)), 3.0);
+    
+    // Basis-Leuchtfarbe ist die gewählte Farbe
+    vec3 glowColor = baseColor;
+    
+    // Addiere einen subtilen weißen Glanz nur an den Kanten
+    vec3 finalColor = glowColor + vec3(0.2) * fresnel * glowIntensity;
+    
+    gl_FragColor = vec4(finalColor, 1.0);
   }
 `
 
@@ -59,10 +72,10 @@ export default function CarModel({
   const { camera } = useThree()
   const [isInitialRender, setIsInitialRender] = useState(true)
 
-  const glowUniforms = useMemo(() => {
+  const drlUniforms = useMemo(() => {
     return {
-      glowColor: { value: new THREE.Color(drlColor) },
-      intensity: { value: 1.5 }
+      baseColor: { value: new THREE.Color(drlColor).multiplyScalar(1.5) },
+      glowIntensity: { value: 0.5 }
     }
   }, [drlColor])
 
@@ -109,18 +122,14 @@ export default function CarModel({
             child.material.color.set(wheelColor)
           } 
           else if (child.name.includes(config.materials.drl)) {
-            // Create a new ShaderMaterial for the DRL
             const drlMaterial = new THREE.ShaderMaterial({
-              uniforms: glowUniforms,
-              vertexShader: glowVertexShader,
-              fragmentShader: glowFragmentShader,
-              side: THREE.FrontSide,
-              blending: THREE.AdditiveBlending,
-              transparent: true
-            })
-            
-            // Apply the new material to the DRL mesh
-            child.material = drlMaterial
+              uniforms: drlUniforms,
+              vertexShader: drlVertexShader,
+              fragmentShader: drlFragmentShader,
+              transparent: true,
+              blending: THREE.AdditiveBlending
+            });
+            child.material = drlMaterial;
           }
           else if (child.name === config.materials.interiorMain) {
             child.material.color.set(interiorMainColor)
@@ -131,7 +140,7 @@ export default function CarModel({
         }
       })
     }
-  }, [scene, bodyColor, wheelColor, drlColor, interiorMainColor, interiorSecondaryColor, isInitialRender, config, glowUniforms])
+  }, [scene, bodyColor, wheelColor, drlColor, interiorMainColor, interiorSecondaryColor, isInitialRender, config, drlUniforms])
 
   useEffect(() => {
     if (groupRef.current) {

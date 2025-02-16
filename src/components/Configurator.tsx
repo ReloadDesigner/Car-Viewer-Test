@@ -2,9 +2,10 @@
 
 import React, { Suspense, useState, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Environment, ContactShadows } from '@react-three/drei'
+import { OrbitControls, Environment, ContactShadows, ACESFilmicToneMapping } from '@react-three/drei'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Camera, Download, RotateCcw, Car, Disc, Lightbulb, Sofa, Palette } from 'lucide-react'
+import { Camera, Palette, Car } from 'lucide-react'
+import * as THREE from 'three'
 import CarModel from './CarModel'
 import Dropdown from './Dropdown'
 import ColorPicker from './ColorPicker'
@@ -22,7 +23,14 @@ const carModels = {
 
 const carConfigs: ModelConfig = {
   'BMW_M3': m3_f80Config,
-  // Add other model configs here as you create them
+  'BMW_M4': m3_f80Config, // Temporär das gleiche Modell für M4
+  'BMW_X5': m3_f80Config, // Temporär das gleiche Modell für X5
+  'Audi_A4': m3_f80Config, // Temporär das gleiche Modell für A4
+  'Audi_A6': m3_f80Config, // Temporär das gleiche Modell für A6
+  'Audi_Q5': m3_f80Config, // Temporär das gleiche Modell für Q5
+  'Mercedes_C-Class': m3_f80Config, // Temporär das gleiche Modell für C-Class
+  'Mercedes_E-Class': m3_f80Config, // Temporär das gleiche Modell für E-Class
+  'Mercedes_GLC': m3_f80Config, // Temporär das gleiche Modell für GLC
 }
 
 const drlColors = [
@@ -50,11 +58,21 @@ export default function Configurator() {
   const [drlColor, setDrlColor] = useState('#FFFFFF')
   const [interiorMainColor, setInteriorMainColor] = useState<string | null>(null)
   const [interiorSecondaryColor, setInteriorSecondaryColor] = useState<string | null>(null)
-  const [showConfigurator, setShowConfigurator] = useState(false)
+  const [showConfigurator, setShowConfigurator] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useEffect(() => {
     const configKey = `${selectedBrand}_${selectedModel}` as keyof typeof carConfigs
-    setCarConfig(carConfigs[configKey] || carConfigs['BMW_M3']) // Fallback to BMW M3 if config not found
+    setCarConfig(carConfigs[configKey] || carConfigs['BMW_M3'])
   }, [selectedBrand, selectedModel])
 
   useEffect(() => {
@@ -68,7 +86,7 @@ export default function Configurator() {
   const handleCustomColor = (setColor: (color: string) => void) => {
     const input = document.createElement('input')
     input.type = 'color'
-    input.onchange = (e) => setColor((e.target as HTMLInputElement).value)
+    input.oninput = (e) => setColor((e.target as HTMLInputElement).value)
     input.click()
   }
 
@@ -80,180 +98,211 @@ export default function Configurator() {
     setInteriorSecondaryColor(originalColors.interiorSecondary)
   }
 
-  const handleBrandChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedBrand(e.target.value)
-    setSelectedModel(carModels[e.target.value as keyof typeof carModels][0])
-    setOriginalColors({
-      body: null,
-      wheel: null,
-      drl: '#FFFFFF',
-      interiorMain: null,
-      interiorSecondary: null
-    })
-  }
-
-  const handleModelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedModel(e.target.value)
-    setOriginalColors({
-      body: null,
-      wheel: null,
-      drl: '#FFFFFF',
-      interiorMain: null,
-      interiorSecondary: null
-    })
-  }
-
   return (
     <div className="w-full h-screen flex flex-col bg-gray-900">
-      <nav className="bg-black bg-opacity-50 p-4 flex justify-between items-center">
+      {/* Header */}
+      <nav className="bg-black bg-opacity-80 backdrop-blur-sm p-4 flex flex-col md:flex-row justify-between items-center gap-4">
         <h1 className="text-white text-2xl font-bold">DRLs Direct Configurator</h1>
-        <div className="flex space-x-4">
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
           <Dropdown
             options={carBrands}
             value={selectedBrand}
-            onChange={handleBrandChange}
+            onChange={(e) => {
+              setSelectedBrand(e.target.value)
+              setSelectedModel(carModels[e.target.value as keyof typeof carModels][0])
+            }}
             label="Brand"
+            className="w-full md:w-40"
           />
           <Dropdown
             options={carModels[selectedBrand as keyof typeof carModels]}
             value={selectedModel}
-            onChange={handleModelChange}
+            onChange={(e) => setSelectedModel(e.target.value)}
             label="Model"
+            className="w-full md:w-40"
           />
         </div>
       </nav>
-      <div className="flex-grow relative">
-        <Canvas shadows camera={{ position: [5, 2, 5], fov: 50 }}>
-          <color attach="background" args={['#111']} />
-          <fog attach="fog" args={['#111', 10, 20]} />
-          <Suspense fallback={null}>
-            <CarModel
-              config={carConfig}
-              bodyColor={bodyColor || '#CCCCCC'}
-              wheelColor={wheelColor || '#333333'}
-              drlColor={drlColor}
-              interiorMainColor={interiorMainColor || '#000000'}
-              interiorSecondaryColor={interiorSecondaryColor || '#333333'}
-              setOriginalColors={setOriginalColors}
-            />
-            <Environment preset="studio" />
-            <ContactShadows 
-              rotation-x={Math.PI / 2}
-              position={[0, -0.0001, 0]}
-              opacity={0.8}
-              width={10}
-              height={10}
-              blur={1}
-              far={10}
-            />
-          </Suspense>
-          <OrbitControls 
-            enablePan={false} 
-            enableZoom={true} 
-            minPolarAngle={Math.PI / 6} 
-            maxPolarAngle={Math.PI / 2}
-            minDistance={2}
-            maxDistance={10}
-          />
-        </Canvas>
-        <div className="absolute bottom-4 left-4 flex space-x-2">
-          <button
-            onClick={() => setShowConfigurator(!showConfigurator)}
-            className="bg-white bg-opacity-10 hover:bg-opacity-20 text-white px-4 py-2 rounded-lg transition-all duration-200"
+
+      {/* Main Content */}
+      <div className="flex-grow relative flex">
+        {/* 3D Viewer */}
+        <div className="flex-grow relative">
+          <Canvas 
+            shadows 
+            camera={{ position: [5, 2, 5], fov: 50 }}
+            gl={{ 
+              toneMapping: THREE.ACESFilmicToneMapping,
+              toneMappingExposure: 0.6
+            }}
           >
-            {showConfigurator ? 'Hide Configurator' : 'Show Configurator'}
-          </button>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all duration-200">
-            <Camera className="inline-block mr-2" size={18} />
-            Screenshot
-          </button>
-          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-all duration-200">
-            <Download className="inline-block mr-2" size={18} />
-            Save Configuration
-          </button>
-        </div>
-      </div>
-      <AnimatePresence>
-        {showConfigurator && (
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 20, stiffness: 100 }}
-            className="absolute top-0 right-0 h-full w-80 bg-black bg-opacity-75 p-6 overflow-y-auto"
-          >
-            <h2 className="text-white text-xl font-bold mb-6">Configuration</h2>
-            <ConfigSection title="Body" icon={Car}>
-              <ColorPicker
-                colors={[
-                  { name: 'Original', hex: originalColors.body || '#CCCCCC' },
-                  { name: 'Black', hex: '#000000' },
-                  { name: 'White', hex: '#FFFFFF' },
-                  { name: 'Red', hex: '#FF0000' },
-                  { name: 'Blue', hex: '#0000FF' },
-                ]}
-                selectedColor={bodyColor || '#CCCCCC'}
-                onChange={setBodyColor}
-                onCustomColor={() => handleCustomColor(setBodyColor)}
+            <color attach="background" args={['#111']} />
+            <fog attach="fog" args={['#111', 10, 20]} />
+            <Suspense fallback={null}>
+              <CarModel
+                config={carConfig}
+                bodyColor={bodyColor ?? originalColors.body ?? '#CCCCCC'}
+                wheelColor={wheelColor ?? originalColors.wheel ?? '#333333'}
+                drlColor={drlColor}
+                interiorMainColor={interiorMainColor ?? originalColors.interiorMain ?? '#000000'}
+                interiorSecondaryColor={interiorSecondaryColor ?? originalColors.interiorSecondary ?? '#333333'}
+                setOriginalColors={setOriginalColors}
               />
-            </ConfigSection>
-            <ConfigSection title="Wheels" icon={Disc}>
-              <ColorPicker
-                colors={[
-                  { name: 'Original', hex: originalColors.wheel || '#333333' },
-                  { name: 'Silver', hex: '#C0C0C0' },
-                  { name: 'Black', hex: '#000000' },
-                  { name: 'Gold', hex: '#FFD700' },
-                ]}
-                selectedColor={wheelColor || '#333333'}
-                onChange={setWheelColor}
-                onCustomColor={() => handleCustomColor(setWheelColor)}
+              <Environment 
+                preset="warehouse"
+                background={false}
               />
-            </ConfigSection>
-            <ConfigSection title="DRL" icon={Lightbulb}>
-              <ColorPicker
-                colors={drlColors}
-                selectedColor={drlColor}
-                onChange={setDrlColor}
-                onCustomColor={() => handleCustomColor(setDrlColor)}
+              <ContactShadows 
+                rotation-x={Math.PI / 2}
+                position={[0, -0.0001, 0]}
+                opacity={0.8}
+                width={10}
+                height={10}
+                blur={1}
+                far={10}
               />
-            </ConfigSection>
-            <ConfigSection title="Interior Main Color" icon={Sofa}>
-              <ColorPicker
-                colors={[
-                  { name: 'Original', hex: originalColors.interiorMain || '#000000' },
-                  { name: 'Beige', hex: '#F5F5DC' },
-                  { name: 'Brown', hex: '#8B4513' },
-                  { name: 'Gray', hex: '#808080' },
-                ]}
-                selectedColor={interiorMainColor || '#000000'}
-                onChange={setInteriorMainColor}
-                onCustomColor={() => handleCustomColor(setInteriorMainColor)}
+              <OrbitControls 
+                enablePan={false} 
+                enableZoom={true} 
+                minPolarAngle={Math.PI / 6} 
+                maxPolarAngle={Math.PI / 2}
+                minDistance={2}
+                maxDistance={10}
               />
-            </ConfigSection>
-            <ConfigSection title="Interior Secondary Color" icon={Palette}>
-              <ColorPicker
-                colors={[
-                  { name: 'Original', hex: originalColors.interiorSecondary || '#333333' },
-                  { name: 'Light Gray', hex: '#D3D3D3' },
-                  { name: 'Black', hex: '#000000' },
-                  { name: 'Brown', hex: '#8B4513' },
-                ]}
-                selectedColor={interiorSecondaryColor || '#333333'}
-                onChange={setInteriorSecondaryColor}
-                onCustomColor={() => handleCustomColor(setInteriorSecondaryColor)}
-              />
-            </ConfigSection>
+            </Suspense>
+          </Canvas>
+
+          {/* Floating Action Buttons */}
+          <div className="absolute bottom-4 left-4 flex flex-col md:flex-row gap-2">
             <button
-              onClick={resetColors}
-              className="mt-6 w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center"
+              onClick={() => setShowConfigurator(!showConfigurator)}
+              className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-200 backdrop-blur-sm flex items-center gap-2"
             >
-              <RotateCcw className="mr-2" size={18} />
-              Reset
+              <Palette size={18} />
+              <span className="hidden md:inline">
+                {showConfigurator ? 'Hide Configurator' : 'Show Configurator'}
+              </span>
             </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <button 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2"
+              onClick={() => {
+                const canvas = document.querySelector('canvas')
+                if (canvas) {
+                  // Erstelle einen temporären Link zum Herunterladen
+                  const link = document.createElement('a')
+                  link.download = `${selectedBrand}_${selectedModel}_config.png`
+                  link.href = canvas.toDataURL('image/png')
+                  document.body.appendChild(link)
+                  link.click()
+                  document.body.removeChild(link)
+                }
+              }}
+            >
+              <Camera size={18} />
+              <span className="hidden md:inline">Screenshot</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Configurator Panel */}
+        <AnimatePresence>
+          {showConfigurator && (
+            <motion.div
+              initial={isMobile ? { y: '100%' } : { x: '100%' }}
+              animate={isMobile ? { y: 0 } : { x: 0 }}
+              exit={isMobile ? { y: '100%' } : { x: '100%' }}
+              transition={{ type: 'spring', damping: 20, stiffness: 100 }}
+              className={`
+                absolute ${isMobile ? 'bottom-0 left-0 right-0 h-[70vh]' : 'top-0 right-0 h-full w-80'} 
+                bg-black/75 backdrop-blur-md p-6 overflow-y-auto
+                border-t-2 md:border-l-2 md:border-t-0 border-white/10
+              `}
+            >
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-white text-xl font-bold">Configuration</h2>
+                  <button
+                    onClick={resetColors}
+                    className="text-white hover:text-red-500 transition-colors"
+                    title="Reset Colors"
+                  >
+                    <Palette size={20} />
+                  </button>
+                </div>
+
+                <ConfigSection title="Body" icon={Car}>
+                  <ColorPicker
+                    colors={[
+                      { hex: originalColors.body || '#CCCCCC' },
+                      { hex: '#FFFFFF' },
+                      { hex: '#FF0000' },
+                      { hex: '#0000FF' },
+                      { hex: '#00FF00' },
+                    ]}
+                    selectedColor={bodyColor || originalColors.body || '#CCCCCC'}
+                    onChange={setBodyColor}
+                    onCustomColor={() => handleCustomColor(setBodyColor)}
+                  />
+                </ConfigSection>
+
+                <ConfigSection title="Wheels" icon={Car}>
+                  <ColorPicker
+                    colors={[
+                      { hex: originalColors.wheel || '#333333' },
+                      { hex: '#FFFFFF' },
+                      { hex: '#FFD700' },
+                      { hex: '#00FF00' },
+                    ]}
+                    selectedColor={wheelColor || originalColors.wheel || '#333333'}
+                    onChange={setWheelColor}
+                    onCustomColor={() => handleCustomColor(setWheelColor)}
+                  />
+                </ConfigSection>
+
+                <ConfigSection title="DRL" icon={Palette}>
+                  <ColorPicker
+                    colors={drlColors}
+                    selectedColor={drlColor}
+                    onChange={setDrlColor}
+                    onCustomColor={() => handleCustomColor(setDrlColor)}
+                  />
+                </ConfigSection>
+
+                <ConfigSection title="Interior Main Color" icon={Car}>
+                  <ColorPicker
+                    colors={[
+                      { hex: originalColors.interiorMain || '#000000' },
+                      { hex: '#FF0000' },
+                      { hex: '#FFFFFF' },
+                      { hex: '#8B4513' },
+                      { hex: '#808080' },
+                      { hex: '#00FF00' },
+                    ]}
+                    selectedColor={interiorMainColor || originalColors.interiorMain || '#000000'}
+                    onChange={setInteriorMainColor}
+                    onCustomColor={() => handleCustomColor(setInteriorMainColor)}
+                  />
+                </ConfigSection>
+
+                <ConfigSection title="Interior Secondary Color" icon={Car}>
+                  <ColorPicker
+                    colors={[
+                      { hex: originalColors.interiorSecondary || '#333333' },
+                      { hex: '#000000' },
+                      { hex: '#FFFFFF' },
+                      { hex: '#8B4513' },
+                      { hex: '#00FF00' },
+                    ]}
+                    selectedColor={interiorSecondaryColor || originalColors.interiorSecondary || '#333333'}
+                    onChange={setInteriorSecondaryColor}
+                    onCustomColor={() => handleCustomColor(setInteriorSecondaryColor)}
+                  />
+                </ConfigSection>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

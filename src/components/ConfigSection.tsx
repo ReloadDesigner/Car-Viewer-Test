@@ -9,14 +9,16 @@ interface ConfigSectionProps {
   children: React.ReactNode
 }
 
-export default function ConfigSection({ title, icon: Icon, children }: ConfigSectionProps) {
+const ConfigSection: React.FC<ConfigSectionProps> = ({ title, icon: Icon, children }) => {
   return (
-    <div className="mb-6">
-      <h3 className="text-white text-lg mb-2 flex items-center">
-        <Icon className="mr-2" size={20} />
-        {title}
-      </h3>
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 text-white/90">
+        <Icon size={18} className="text-white/60" />
+        <h3 className="text-sm font-medium">{title}</h3>
+      </div>
       {children}
     </div>
   )
 }
+
+export default ConfigSection

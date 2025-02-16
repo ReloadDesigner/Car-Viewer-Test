@@ -8,15 +8,16 @@ interface DropdownProps {
   value: string
   onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
   label?: string
+  className?: string
 }
 
-export default function Dropdown({ options, value, onChange, label }: DropdownProps) {
+export default function Dropdown({ options, value, onChange, label, className }: DropdownProps) {
   return (
     <div className="relative">
       <select
         value={value}
         onChange={onChange}
-        className="appearance-none bg-white bg-opacity-10 text-white py-2 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-opacity-20 transition-all duration-200"
+        className={`appearance-none bg-white bg-opacity-10 text-white py-2 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-opacity-20 transition-all duration-200 ${className || ''}`}
       >
         {options.map((option) => (
           <option key={option} value={option}>

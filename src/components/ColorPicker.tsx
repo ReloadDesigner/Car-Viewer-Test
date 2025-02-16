@@ -1,29 +1,52 @@
 'use client'
 
 import React from 'react'
+import { Plus } from 'lucide-react'
+
+interface Color {
+  name: string
+  hex: string
+}
 
 interface ColorPickerProps {
-  colors: { name: string; hex: string }[]
+  colors: Color[]
   selectedColor: string
   onChange: (color: string) => void
   onCustomColor: () => void
 }
 
-export default function ColorPicker({ colors, selectedColor, onChange, onCustomColor }: ColorPickerProps) {
+const ColorPicker: React.FC<ColorPickerProps> = ({
+  colors,
+  selectedColor,
+  onChange,
+  onCustomColor,
+}) => {
   return (
     <div className="flex flex-wrap gap-2">
       {colors.map((color) => (
         <button
           key={color.hex}
-          className={`w-8 h-8 rounded-full transition-all duration-200 ${selectedColor === color.hex ? 'ring-2 ring-white scale-110' : 'hover:scale-105'}`}
-          style={{ backgroundColor: color.hex }}
           onClick={() => onChange(color.hex)}
+          className={`
+            w-8 h-8 rounded-full transition-all duration-200
+            ${selectedColor === color.hex ? 'ring-2 ring-white ring-offset-2 ring-offset-black scale-110' : 'hover:scale-110'}
+          `}
+          style={{ 
+            backgroundColor: color.hex,
+            border: color.hex === '#FFFFFF' ? '1px solid rgba(255,255,255,0.2)' : 'none'
+          }}
+          title={color.name}
         />
       ))}
       <button
-        className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 via-green-500 to-blue-500 hover:scale-105 transition-all duration-200"
         onClick={onCustomColor}
-      />
+        className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200 flex items-center justify-center"
+        title="Custom Color"
+      >
+        <Plus size={16} className="text-white" />
+      </button>
     </div>
   )
 }
+
+export default ColorPicker
