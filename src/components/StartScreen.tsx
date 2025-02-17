@@ -1,31 +1,37 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { useMediaQuery } from 'react-responsive'
+import { Car } from 'lucide-react'
 
 interface StartScreenProps {
   onStartConfiguration: () => void
-  onLoadConfiguration: () => void
 }
 
-export default function StartScreen({ onStartConfiguration, onLoadConfiguration }: StartScreenProps) {
+const carBrands = ['BMW', 'Audi', 'Mercedes']
+const carModels = {
+  BMW: ['M3', 'M4', 'X5'],
+  Audi: ['A4', 'A6', 'Q5'],
+  Mercedes: ['C-Class', 'E-Class', 'GLC'],
+}
+
+export default function StartScreen({ onStartConfiguration }: StartScreenProps) {
   const [isLoaded, setIsLoaded] = useState(false)
   const [isMobileReady, setIsMobileReady] = useState(false)
   const isMobile = useMediaQuery({ maxWidth: 768 })
+  const [showModelSelector, setShowModelSelector] = useState(false)
+  const [selectedBrand, setSelectedBrand] = useState(carBrands[0])
+  const [selectedModel, setSelectedModel] = useState(carModels[carBrands[0] as keyof typeof carModels][0])
 
   useEffect(() => {
     setIsLoaded(true)
-    // Set initial mobile state based on window width
     setIsMobileReady(true)
   }, [])
 
-  // Don't render image until we know the device type
   if (!isMobileReady) {
-    return (
-      <div className="w-full h-screen bg-black" />
-    )
+    return <div className="w-full h-screen bg-black" />
   }
 
   return (
@@ -46,7 +52,6 @@ export default function StartScreen({ onStartConfiguration, onLoadConfiguration 
           sizes="100vw"
           quality={100}
         />
-        {/* Dark Overlay */}
         <div className="absolute inset-0 bg-black bg-opacity-50" />
       </motion.div>
 
@@ -80,19 +85,91 @@ export default function StartScreen({ onStartConfiguration, onLoadConfiguration 
           className="flex flex-col sm:flex-row gap-4"
         >
           <button
-            onClick={onLoadConfiguration}
-            className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-sm transition-all duration-200"
+            onClick={() => setShowModelSelector(true)}
+            className="px-8 py-3 bg-gradient-to-br from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 text-white rounded-full transition-all duration-200 flex items-center gap-2"
           >
-            Load Saved Configuration
-          </button>
-          <button
-            onClick={onStartConfiguration}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-all duration-200"
-          >
-            Start New Configuration
+            <Car size={24} />
+            Start Configuration
           </button>
         </motion.div>
       </motion.div>
+
+      {/* Model Selector Modal */}
+      <AnimatePresence>
+        {showModelSelector && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
+              className="bg-black/90 rounded-2xl border border-white/10 p-6 w-full max-w-md"
+            >
+              <div className="space-y-6">
+                <h2 className="text-white text-xl font-bold">Select Vehicle</h2>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-white/60 text-sm">Brand</label>
+                    <select
+                      value={selectedBrand}
+                      onChange={(e) => {
+                        setSelectedBrand(e.target.value)
+                        setSelectedModel(carModels[e.target.value as keyof typeof carModels][0])
+                      }}
+                      className="w-full bg-white/5 text-white border border-white/10 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-white/20"
+                    >
+                      {carBrands.map(brand => (
+                        <option key={brand} value={brand} className="bg-black hover:bg-white/5">
+                          {brand}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-white/60 text-sm">Model</label>
+                    <select
+                      value={selectedModel}
+                      onChange={(e) => setSelectedModel(e.target.value)}
+                      className="w-full bg-white/5 text-white border border-white/10 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-white/20"
+                    >
+                      {carModels[selectedBrand as keyof typeof carModels].map(model => (
+                        <option key={model} value={model} className="bg-black hover:bg-white/5">
+                          {model}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => setShowModelSelector(false)}
+                    className="flex-1 px-4 py-2 rounded-lg bg-black/40 hover:bg-black/60 text-white border border-white/10 transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      onStartConfiguration()
+                      setShowModelSelector(false)
+                    }}
+                    className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-br from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 text-white transition-all duration-200 shadow-lg"
+                  >
+                    Start Configuration
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

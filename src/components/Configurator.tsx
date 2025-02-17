@@ -4,7 +4,7 @@ import React, { Suspense, useState, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows, ACESFilmicToneMapping } from '@react-three/drei'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Camera, Palette, Car, SunDim } from 'lucide-react'
+import { Camera, Palette, Car, SunDim, PaintBucket, CircleDot, Lightbulb, Layers, Component, GripHorizontal, Baseline } from 'lucide-react'
 import * as THREE from 'three'
 import CarModel from './CarModel'
 import Dropdown from './Dropdown'
@@ -426,7 +426,7 @@ export default function Configurator() {
                         : ''
                       }
                     `}>
-                      <ConfigSection title="Body" icon={Car}>
+                      <ConfigSection title="Body" icon={PaintBucket}>
                         <ColorPicker
                           colors={[
                             { hex: originalColors.body || '#CCCCCC', name: 'Original' },
@@ -450,7 +450,7 @@ export default function Configurator() {
                         : ''
                       }
                     `}>
-                      <ConfigSection title="Wheels" icon={Car}>
+                      <ConfigSection title="Wheels" icon={CircleDot}>
                         <ColorPicker
                           colors={[
                             { hex: originalColors.wheel || '#333333', name: 'Original' },
@@ -472,7 +472,7 @@ export default function Configurator() {
                         : ''
                       }
                     `}>
-                      <ConfigSection title="DRL" icon={Palette}>
+                      <ConfigSection title="DRL" icon={Lightbulb}>
                         <ColorPicker
                           colors={[
                             { hex: '#FFFFFF', name: 'Crystal White' },
@@ -496,7 +496,7 @@ export default function Configurator() {
                         : ''
                       }
                     `}>
-                      <ConfigSection title="Interior Primary" icon={Car}>
+                      <ConfigSection title="Interior Primary" icon={Component}>
                         <ColorPicker
                           colors={[
                             { hex: '#2A0F0F', name: 'Dark Red' },
@@ -519,7 +519,7 @@ export default function Configurator() {
                         : ''
                       }
                     `}>
-                      <ConfigSection title="Interior Secondary" icon={Car}>
+                      <ConfigSection title="Interior Secondary" icon={Layers}>
                         <ColorPicker
                           colors={[
                             { hex: '#2A0F0F', name: 'Dark Red' },
