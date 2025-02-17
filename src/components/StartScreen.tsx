@@ -12,11 +12,21 @@ interface StartScreenProps {
 
 export default function StartScreen({ onStartConfiguration, onLoadConfiguration }: StartScreenProps) {
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isMobileReady, setIsMobileReady] = useState(false)
   const isMobile = useMediaQuery({ maxWidth: 768 })
 
   useEffect(() => {
     setIsLoaded(true)
+    // Set initial mobile state based on window width
+    setIsMobileReady(true)
   }, [])
+
+  // Don't render image until we know the device type
+  if (!isMobileReady) {
+    return (
+      <div className="w-full h-screen bg-black" />
+    )
+  }
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
@@ -33,7 +43,7 @@ export default function StartScreen({ onStartConfiguration, onLoadConfiguration 
           fill
           style={{ objectFit: 'cover' }}
           priority
-          sizes={isMobile ? "100vw" : "100vw"}
+          sizes="100vw"
           quality={100}
         />
         {/* Dark Overlay */}

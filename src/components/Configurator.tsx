@@ -156,9 +156,9 @@ export default function Configurator() {
         <Image 
           src="/logo.png" 
           alt="DRLs Direct Logo" 
-          width={150} 
-          height={50}
-          className="object-contain"
+          width={180}
+          height={60}
+          className="object-contain w-[150px] h-[50px] md:w-[180px] md:h-[60px]"
         />
         <div className="flex justify-end">
           <button
