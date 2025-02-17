@@ -148,18 +148,36 @@ export default function CarModel({
       const center = box.getCenter(new THREE.Vector3())
       const size = box.getSize(new THREE.Vector3())
 
-      // Reset the position
-      groupRef.current.position.set(0, 0, 0)
-      
-      // Adjust the y-position to place the car on the ground
-      groupRef.current.position.y = -box.min.y
+      // Zentriere das Modell horizontal, aber lass es auf dem Boden
+      groupRef.current.position.set(-center.x, -box.min.y, -center.z)
 
+      // Berechne die optimale Kameraposition
       const fov = camera.fov * (Math.PI / 180)
-      const distance = Math.abs(size.y / Math.sin(fov / 2)) * 1.5
-      camera.position.set(distance, distance / 2, distance)
-      camera.lookAt(new THREE.Vector3(0, size.y / 2, 0))
+      const maxDim = Math.max(size.x, size.y, size.z)
+      const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.2
+
+      // Setze die Kamera auf eine Position, die das gesamte Modell zeigt
+      camera.position.set(distance * 0.8, distance * 0.4, distance * 0.8)
+      camera.lookAt(new THREE.Vector3(0, size.y / 4, 0))
+      camera.updateProjectionMatrix()
+
+      // Optimiere die Geometrie
+      scene.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          if (child.geometry) {
+            child.geometry.computeBoundingSphere()
+          }
+          if (child.material) {
+            child.material.side = THREE.FrontSide
+          }
+        }
+      })
     }
   }, [scene, camera])
 
-  return <group ref={groupRef}><primitive object={scene} /></group>
+  return (
+    <group ref={groupRef}>
+      <primitive object={scene} />
+    </group>
+  )
 }

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import { useMediaQuery } from 'react-responsive'
 
 interface StartScreenProps {
   onStartConfiguration: () => void
@@ -11,6 +12,7 @@ interface StartScreenProps {
 
 export default function StartScreen({ onStartConfiguration, onLoadConfiguration }: StartScreenProps) {
   const [isLoaded, setIsLoaded] = useState(false)
+  const isMobile = useMediaQuery({ maxWidth: 768 })
 
   useEffect(() => {
     setIsLoaded(true)
@@ -26,11 +28,13 @@ export default function StartScreen({ onStartConfiguration, onLoadConfiguration 
         className="absolute inset-0"
       >
         <Image
-          src="/DrlsDirect-Home.jpg"
+          src={isMobile ? "/DrlsDirect-Home(mobile).jpg" : "/DrlsDirect-Home.jpg"}
           alt="DRLs Direct Background"
           fill
           style={{ objectFit: 'cover' }}
           priority
+          sizes={isMobile ? "100vw" : "100vw"}
+          quality={100}
         />
         {/* Dark Overlay */}
         <div className="absolute inset-0 bg-black bg-opacity-50" />
@@ -47,41 +51,37 @@ export default function StartScreen({ onStartConfiguration, onLoadConfiguration 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
           transition={{ duration: 1, delay: 0.8 }}
-          className="text-white text-5xl md:text-7xl font-bold mb-4"
+          className="text-white text-5xl md:text-7xl font-bold mb-4 text-center"
         >
           DRLs Direct
         </motion.h1>
-        
-        <motion.p
+        <motion.h2
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
           transition={{ duration: 1, delay: 1 }}
-          className="text-white text-xl md:text-2xl mb-12"
+          className="text-white/80 text-xl md:text-2xl mb-12 text-center"
         >
           3D Configurator
-        </motion.p>
-
-        <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
-            transition={{ duration: 1, delay: 1.2 }}
+        </motion.h2>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
+          transition={{ duration: 1, delay: 1.2 }}
+          className="flex flex-col sm:flex-row gap-4"
+        >
+          <button
             onClick={onLoadConfiguration}
-            className="w-full px-6 py-3 bg-gray-800 bg-opacity-80 hover:bg-opacity-90 text-white rounded-lg transition-all duration-300 backdrop-blur-sm"
+            className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-sm transition-all duration-200"
           >
             Load Saved Configuration
-          </motion.button>
-
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
-            transition={{ duration: 1, delay: 1.4 }}
+          </button>
+          <button
             onClick={onStartConfiguration}
-            className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300"
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-all duration-200"
           >
             Start New Configuration
-          </motion.button>
-        </div>
+          </button>
+        </motion.div>
       </motion.div>
     </div>
   )
