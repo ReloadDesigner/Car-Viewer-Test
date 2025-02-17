@@ -163,7 +163,7 @@ export default function Configurator() {
         <div className="flex justify-end">
           <button
             onClick={() => setShowVehicleSelector(true)}
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all duration-200 flex items-center gap-2"
+            className="px-4 py-2 bg-black/40 hover:bg-black/60 text-white rounded-full transition-all duration-200 flex items-center gap-2 border border-white/10 backdrop-blur-sm shadow-lg"
           >
             <Car size={20} />
             <span className="hidden md:inline">Change Vehicle</span>
@@ -175,69 +175,82 @@ export default function Configurator() {
       </nav>
 
       {/* Vehicle Selector Modal */}
-      {showVehicleSelector && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-black/90 rounded-2xl border border-white/10 p-6 w-full max-w-md">
-            <div className="space-y-6">
-              <h2 className="text-white text-xl font-bold">Select Vehicle</h2>
-              
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-white/60 text-sm">Brand</label>
-                  <select
-                    value={tempBrand}
-                    onChange={(e) => {
-                      setTempBrand(e.target.value)
-                      setTempModel(carModels[e.target.value as keyof typeof carModels][0])
+      <AnimatePresence>
+        {showVehicleSelector && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
+              className="bg-black/90 rounded-2xl border border-white/10 p-6 w-full max-w-md"
+            >
+              <div className="space-y-6">
+                <h2 className="text-white text-xl font-bold">Select Vehicle</h2>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-white/60 text-sm">Brand</label>
+                    <select
+                      value={tempBrand}
+                      onChange={(e) => {
+                        setTempBrand(e.target.value)
+                        setTempModel(carModels[e.target.value as keyof typeof carModels][0])
+                      }}
+                      className="w-full bg-white/5 text-white border border-white/10 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-white/20"
+                    >
+                      {carBrands.map(brand => (
+                        <option key={brand} value={brand} className="bg-black hover:bg-white/5">
+                          {brand}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-white/60 text-sm">Model</label>
+                    <select
+                      value={tempModel}
+                      onChange={(e) => setTempModel(e.target.value)}
+                      className="w-full bg-white/5 text-white border border-white/10 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-white/20"
+                    >
+                      {carModels[tempBrand as keyof typeof carModels].map(model => (
+                        <option key={model} value={model} className="bg-black hover:bg-white/5">
+                          {model}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => setShowVehicleSelector(false)}
+                    className="flex-1 px-4 py-2 rounded-lg bg-black/40 hover:bg-black/60 text-white border border-white/10 transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedBrand(tempBrand)
+                      setSelectedModel(tempModel)
+                      setShowVehicleSelector(false)
                     }}
-                    className="w-full bg-white/5 text-white border border-white/10 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-br from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 text-white transition-all duration-200 shadow-lg"
                   >
-                    {carBrands.map(brand => (
-                      <option key={brand} value={brand} className="bg-black">
-                        {brand}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-white/60 text-sm">Model</label>
-                  <select
-                    value={tempModel}
-                    onChange={(e) => setTempModel(e.target.value)}
-                    className="w-full bg-white/5 text-white border border-white/10 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    {carModels[tempBrand as keyof typeof carModels].map(model => (
-                      <option key={model} value={model} className="bg-black">
-                        {model}
-                      </option>
-                    ))}
-                  </select>
+                    Load Vehicle
+                  </button>
                 </div>
               </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={() => setShowVehicleSelector(false)}
-                  className="flex-1 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedBrand(tempBrand)
-                    setSelectedModel(tempModel)
-                    setShowVehicleSelector(false)
-                  }}
-                  className="flex-1 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200"
-                >
-                  Load Vehicle
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content */}
       <div className="relative flex-1 flex">
@@ -312,7 +325,7 @@ export default function Configurator() {
           `}>
             <button
               onClick={() => setShowConfigurator(!showConfigurator)}
-              className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full transition-all duration-200 backdrop-blur-sm flex items-center gap-2 shadow-lg"
+              className="bg-black/40 hover:bg-black/60 text-white px-4 py-2 rounded-full transition-all duration-200 backdrop-blur-sm flex items-center gap-2 shadow-lg border border-white/10"
             >
               <Palette size={20} />
               <span className={isMobile ? 'hidden' : 'hidden md:inline'}>
@@ -320,7 +333,7 @@ export default function Configurator() {
               </span>
             </button>
             <button 
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-2 shadow-lg"
+              className="bg-gradient-to-br from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 text-white px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-2 shadow-lg"
               onClick={captureScreenshot}
             >
               <Camera size={20} />
