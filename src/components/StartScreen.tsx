@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { useMediaQuery } from 'react-responsive'
 import { Car } from 'lucide-react'
+import LoadButton from './LoadButton'
 
 interface StartScreenProps {
   onStartConfiguration: () => void
@@ -24,11 +25,22 @@ export default function StartScreen({ onStartConfiguration }: StartScreenProps) 
   const [showModelSelector, setShowModelSelector] = useState(false)
   const [selectedBrand, setSelectedBrand] = useState(carBrands[0])
   const [selectedModel, setSelectedModel] = useState(carModels[carBrands[0] as keyof typeof carModels][0])
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     setIsLoaded(true)
     setIsMobileReady(true)
   }, [])
+
+  const handleStartConfig = async () => {
+    setIsLoading(true)
+    
+    // Warte einen kurzen Moment für die Button-Animation
+    await new Promise(resolve => setTimeout(resolve, 300))
+    
+    onStartConfiguration()
+    setShowModelSelector(false)
+  }
 
   if (!isMobileReady) {
     return <div className="w-full h-screen bg-black" />
@@ -123,6 +135,7 @@ export default function StartScreen({ onStartConfiguration }: StartScreenProps) 
                         setSelectedModel(carModels[e.target.value as keyof typeof carModels][0])
                       }}
                       className="w-full bg-white/5 text-white border border-white/10 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-white/20"
+                      disabled={isLoading}
                     >
                       {carBrands.map(brand => (
                         <option key={brand} value={brand} className="bg-black hover:bg-white/5">
@@ -138,6 +151,7 @@ export default function StartScreen({ onStartConfiguration }: StartScreenProps) 
                       value={selectedModel}
                       onChange={(e) => setSelectedModel(e.target.value)}
                       className="w-full bg-white/5 text-white border border-white/10 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-white/20"
+                      disabled={isLoading}
                     >
                       {carModels[selectedBrand as keyof typeof carModels].map(model => (
                         <option key={model} value={model} className="bg-black hover:bg-white/5">
@@ -152,18 +166,17 @@ export default function StartScreen({ onStartConfiguration }: StartScreenProps) 
                   <button
                     onClick={() => setShowModelSelector(false)}
                     className="flex-1 px-4 py-2 rounded-lg bg-black/40 hover:bg-black/60 text-white border border-white/10 transition-all duration-200"
+                    disabled={isLoading}
                   >
                     Cancel
                   </button>
-                  <button
-                    onClick={() => {
-                      onStartConfiguration()
-                      setShowModelSelector(false)
-                    }}
+                  <LoadButton
+                    onClick={handleStartConfig}
+                    isLoading={isLoading}
                     className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-br from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 text-white transition-all duration-200 shadow-lg"
                   >
                     Start Configuration
-                  </button>
+                  </LoadButton>
                 </div>
               </div>
             </motion.div>

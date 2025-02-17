@@ -10,6 +10,7 @@ import CarModel from './CarModel'
 import Dropdown from './Dropdown'
 import ColorPicker from './ColorPicker'
 import ConfigSection from './ConfigSection'
+import LoadButton from './LoadButton'
 import { CarConfig, ModelConfig } from '../types/carConfig'
 import { m3_f80Config } from '../config/modelConfigs/bmwConfigs/m3_f80'
 import Image from 'next/image'
@@ -75,6 +76,7 @@ export default function Configurator() {
   const [showVehicleSelector, setShowVehicleSelector] = useState(false)
   const [tempBrand, setTempBrand] = useState(selectedBrand)
   const [tempModel, setTempModel] = useState(selectedModel)
+  const [isModelLoading, setIsModelLoading] = useState(false)
 
   useEffect(() => {
     const checkMobile = () => {
@@ -149,6 +151,26 @@ export default function Configurator() {
     }
   };
 
+  const handleLoadModel = async () => {
+    setIsModelLoading(true)
+    setShowVehicleSelector(false)
+    
+    // Warte einen kurzen Moment für die Button-Animation
+    await new Promise(resolve => setTimeout(resolve, 300))
+    
+    const configKey = `${tempBrand}_${tempModel}` as keyof typeof carConfigs
+    setSelectedBrand(tempBrand)
+    setSelectedModel(tempModel)
+    setCarConfig(carConfigs[configKey] || carConfigs['BMW_M3'])
+    
+    // Warte auf das nächste Frame für smooth transition
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setIsModelLoading(false)
+      }, 500)
+    })
+  }
+
   return (
     <div className="w-full h-screen flex flex-col bg-gray-900 overflow-hidden">
       {/* Header */}
@@ -203,6 +225,7 @@ export default function Configurator() {
                         setTempModel(carModels[e.target.value as keyof typeof carModels][0])
                       }}
                       className="w-full bg-white/5 text-white border border-white/10 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-white/20"
+                      disabled={isModelLoading}
                     >
                       {carBrands.map(brand => (
                         <option key={brand} value={brand} className="bg-black hover:bg-white/5">
@@ -218,6 +241,7 @@ export default function Configurator() {
                       value={tempModel}
                       onChange={(e) => setTempModel(e.target.value)}
                       className="w-full bg-white/5 text-white border border-white/10 rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-white/20"
+                      disabled={isModelLoading}
                     >
                       {carModels[tempBrand as keyof typeof carModels].map(model => (
                         <option key={model} value={model} className="bg-black hover:bg-white/5">
@@ -232,19 +256,17 @@ export default function Configurator() {
                   <button
                     onClick={() => setShowVehicleSelector(false)}
                     className="flex-1 px-4 py-2 rounded-lg bg-black/40 hover:bg-black/60 text-white border border-white/10 transition-all duration-200"
+                    disabled={isModelLoading}
                   >
                     Cancel
                   </button>
-                  <button
-                    onClick={() => {
-                      setSelectedBrand(tempBrand)
-                      setSelectedModel(tempModel)
-                      setShowVehicleSelector(false)
-                    }}
+                  <LoadButton
+                    onClick={handleLoadModel}
+                    isLoading={isModelLoading}
                     className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-br from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 text-white transition-all duration-200 shadow-lg"
                   >
                     Load Vehicle
-                  </button>
+                  </LoadButton>
                 </div>
               </div>
             </motion.div>
@@ -276,19 +298,22 @@ export default function Configurator() {
             <color attach="background" args={['#111']} />
             <fog attach="fog" args={['#111', isMobile ? 5 : 10, isMobile ? 15 : 20]} />
             <Suspense fallback={null}>
-              <CarModel
-                config={carConfig}
-                bodyColor={bodyColor ?? originalColors.body ?? '#CCCCCC'}
-                wheelColor={wheelColor ?? originalColors.wheel ?? '#333333'}
-                drlColor={drlColor}
-                interiorMainColor={interiorMainColor ?? originalColors.interiorMain ?? '#000000'}
-                interiorSecondaryColor={interiorSecondaryColor ?? originalColors.interiorSecondary ?? '#333333'}
-                setOriginalColors={setOriginalColors}
-              />
-              <Environment 
-                preset={selectedEnvironment}
-                background={false}
-              />
+              <motion.group
+                initial={{ opacity: 0 }}
+                animate={{ opacity: isModelLoading ? 0 : 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <CarModel
+                  config={carConfig}
+                  bodyColor={bodyColor ?? originalColors.body ?? '#CCCCCC'}
+                  wheelColor={wheelColor ?? originalColors.wheel ?? '#333333'}
+                  drlColor={drlColor}
+                  interiorMainColor={interiorMainColor ?? originalColors.interiorMain ?? '#000000'}
+                  interiorSecondaryColor={interiorSecondaryColor ?? originalColors.interiorSecondary ?? '#333333'}
+                  setOriginalColors={setOriginalColors}
+                />
+              </motion.group>
+              <Environment preset={selectedEnvironment} background={false} />
               <ContactShadows 
                 rotation-x={Math.PI / 2}
                 position={[0, -0.0001, 0]}
@@ -298,20 +323,20 @@ export default function Configurator() {
                 blur={isMobile ? 0.5 : 1}
                 far={isMobile ? 5 : 10}
               />
-              <OrbitControls 
-                enablePan={false} 
-                enableZoom={true} 
-                minPolarAngle={Math.PI / 6} 
-                maxPolarAngle={Math.PI / 2}
-                minDistance={isMobile ? 4 : 2}
-                maxDistance={isMobile ? 8 : 10}
-                enableDamping={true}
-                dampingFactor={0.05}
-                rotateSpeed={isMobile ? 0.7 : 1}
-                zoomSpeed={isMobile ? 0.7 : 1}
-                target={new THREE.Vector3(0, 1, 0)}
-              />
             </Suspense>
+            <OrbitControls 
+              enablePan={false} 
+              enableZoom={true} 
+              minPolarAngle={Math.PI / 6} 
+              maxPolarAngle={Math.PI / 2}
+              minDistance={isMobile ? 4 : 2}
+              maxDistance={isMobile ? 8 : 10}
+              enableDamping={true}
+              dampingFactor={0.05}
+              rotateSpeed={isMobile ? 0.7 : 1}
+              zoomSpeed={isMobile ? 0.7 : 1}
+              target={new THREE.Vector3(0, 1, 0)}
+            />
           </Canvas>
 
           {/* Floating Action Buttons */}
