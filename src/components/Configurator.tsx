@@ -70,15 +70,26 @@ export default function Configurator() {
   const [showConfigurator, setShowConfigurator] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [selectedEnvironment, setSelectedEnvironment] = useState<typeof environmentPresets[number]['value']>('warehouse')
+  const [showCustomColorPicker, setShowCustomColorPicker] = useState(false)
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768)
+      if (window.innerWidth <= 768) {
+        setShowConfigurator(false)
+      }
     }
+    
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
+
+  useEffect(() => {
+    if (!showConfigurator) {
+      setShowCustomColorPicker(false)
+    }
+  }, [showConfigurator])
 
   useEffect(() => {
     const configKey = `${selectedBrand}_${selectedModel}` as keyof typeof carConfigs
@@ -94,10 +105,7 @@ export default function Configurator() {
   }, [originalColors])
 
   const handleCustomColor = (setColor: (color: string) => void) => {
-    const input = document.createElement('input')
-    input.type = 'color'
-    input.oninput = (e) => setColor((e.target as HTMLInputElement).value)
-    input.click()
+    setShowCustomColorPicker(true)
   }
 
   const resetColors = () => {
@@ -232,6 +240,7 @@ export default function Configurator() {
               ? 'bottom-4 left-1/2 -translate-x-1/2 flex-row' 
               : 'bottom-4 left-4 flex-col md:flex-row'
             }
+            ${showCustomColorPicker && isMobile && !showConfigurator ? 'hidden' : ''}
           `}>
             <button
               onClick={() => setShowConfigurator(!showConfigurator)}
