@@ -309,7 +309,7 @@ export default function Configurator() {
                     `}>
                       <div className="flex items-center gap-2 text-white mb-1.5">
                         <SunDim size={16} />
-                        <span className="text-sm whitespace-nowrap">Umgebungslicht</span>
+                        <span className="text-sm whitespace-nowrap">Environment Light</span>
                       </div>
                       <select
                         value={selectedEnvironment}
@@ -336,15 +336,15 @@ export default function Configurator() {
                         : ''
                       }
                     `}>
-                      <ConfigSection title="Karosserie" icon={Car}>
+                      <ConfigSection title="Body" icon={Car}>
                         <ColorPicker
                           colors={[
                             { hex: originalColors.body || '#CCCCCC', name: 'Original' },
-                            { hex: '#1C1C1C', name: 'Schwarz Metallic' },
-                            { hex: '#C0C0C0', name: 'Silber Metallic' },
-                            { hex: '#8B0000', name: 'Rot Metallic' },
-                            { hex: '#000080', name: 'Blau Metallic' },
-                            { hex: '#004225', name: 'Grün Metallic' },
+                            { hex: '#1C1C1C', name: 'Black Metallic' },
+                            { hex: '#C0C0C0', name: 'Silver Metallic' },
+                            { hex: '#8B0000', name: 'Red Metallic' },
+                            { hex: '#000080', name: 'Blue Metallic' },
+                            { hex: '#004225', name: 'Green Metallic' },
                           ]}
                           selectedColor={bodyColor || originalColors.body || '#CCCCCC'}
                           onChange={setBodyColor}
@@ -360,12 +360,12 @@ export default function Configurator() {
                         : ''
                       }
                     `}>
-                      <ConfigSection title="Felgen" icon={Car}>
+                      <ConfigSection title="Wheels" icon={Car}>
                         <ColorPicker
                           colors={[
                             { hex: originalColors.wheel || '#333333', name: 'Original' },
-                            { hex: '#1C1C1C', name: 'Schwarz Metallic' },
-                            { hex: '#C0C0C0', name: 'Silber Metallic' },
+                            { hex: '#1C1C1C', name: 'Black Metallic' },
+                            { hex: '#C0C0C0', name: 'Silver Metallic' },
                             { hex: '#FFD700', name: 'Gold Metallic' },
                           ]}
                           selectedColor={wheelColor || originalColors.wheel || '#333333'}
@@ -382,15 +382,15 @@ export default function Configurator() {
                         : ''
                       }
                     `}>
-                      <ConfigSection title="Tagfahrlicht" icon={Palette}>
+                      <ConfigSection title="DRL" icon={Palette}>
                         <ColorPicker
                           colors={[
-                            { hex: '#FFFFFF', name: 'Kristallweiß' },
-                            { hex: '#FFD700', name: 'Goldgelb' },
+                            { hex: '#FFFFFF', name: 'Crystal White' },
+                            { hex: '#FFD700', name: 'Gold Yellow' },
                             { hex: '#FF7300', name: 'Amber' },
-                            { hex: '#FF2D00', name: 'Signalrot' },
-                            { hex: '#4169E1', name: 'Royalblau' },
-                            { hex: '#39FF14', name: 'Neongrün' },
+                            { hex: '#FF2D00', name: 'Signal Red' },
+                            { hex: '#4169E1', name: 'Royal Blue' },
+                            { hex: '#39FF14', name: 'Neon Green' },
                           ]}
                           selectedColor={drlColor}
                           onChange={setDrlColor}
@@ -406,14 +406,14 @@ export default function Configurator() {
                         : ''
                       }
                     `}>
-                      <ConfigSection title="Innenraum Primär" icon={Car}>
+                      <ConfigSection title="Interior Primary" icon={Car}>
                         <ColorPicker
                           colors={[
-                            { hex: '#2A0F0F', name: 'Dunkelrot' },
-                            { hex: '#8B0000', name: 'Weinrot' },
-                            { hex: '#F5F5F5', name: 'Hellgrau' },
-                            { hex: '#8B4513', name: 'Braun' },
-                            { hex: '#1C1C1C', name: 'Schwarz' },
+                            { hex: '#2A0F0F', name: 'Dark Red' },
+                            { hex: '#8B0000', name: 'Wine Red' },
+                            { hex: '#F5F5F5', name: 'Light Grey' },
+                            { hex: '#8B4513', name: 'Brown' },
+                            { hex: '#1C1C1C', name: 'Black' },
                           ]}
                           selectedColor={interiorMainColor || originalColors.interiorMain || '#000000'}
                           onChange={setInteriorMainColor}
@@ -429,13 +429,13 @@ export default function Configurator() {
                         : ''
                       }
                     `}>
-                      <ConfigSection title="Innenraum Sekundär" icon={Car}>
+                      <ConfigSection title="Interior Secondary" icon={Car}>
                         <ColorPicker
                           colors={[
-                            { hex: '#2A0F0F', name: 'Dunkelrot' },
-                            { hex: '#F5F5F5', name: 'Hellgrau' },
-                            { hex: '#8B4513', name: 'Braun' },
-                            { hex: '#1C1C1C', name: 'Schwarz' },
+                            { hex: '#2A0F0F', name: 'Dark Red' },
+                            { hex: '#F5F5F5', name: 'Light Grey' },
+                            { hex: '#8B4513', name: 'Brown' },
+                            { hex: '#1C1C1C', name: 'Black' },
                           ]}
                           selectedColor={interiorSecondaryColor || originalColors.interiorSecondary || '#333333'}
                           onChange={setInteriorSecondaryColor}
