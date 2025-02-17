@@ -12,6 +12,7 @@ import ColorPicker from './ColorPicker'
 import ConfigSection from './ConfigSection'
 import { CarConfig, ModelConfig } from '../types/carConfig'
 import { m3_f80Config } from '../config/modelConfigs/bmwConfigs/m3_f80'
+import Image from 'next/image'
 
 const carBrands = ['BMW', 'Audi', 'Mercedes']
 
@@ -71,6 +72,9 @@ export default function Configurator() {
   const [isMobile, setIsMobile] = useState(false)
   const [selectedEnvironment, setSelectedEnvironment] = useState<typeof environmentPresets[number]['value']>('warehouse')
   const [showCustomColorPicker, setShowCustomColorPicker] = useState(false)
+  const [showVehicleSelector, setShowVehicleSelector] = useState(false)
+  const [tempBrand, setTempBrand] = useState(selectedBrand)
+  const [tempModel, setTempModel] = useState(selectedModel)
 
   useEffect(() => {
     const checkMobile = () => {
@@ -148,28 +152,92 @@ export default function Configurator() {
   return (
     <div className="w-full h-screen flex flex-col bg-gray-900 overflow-hidden">
       {/* Header */}
-      <nav className="bg-black bg-opacity-80 backdrop-blur-sm p-4 flex flex-col md:flex-row justify-between items-center gap-4 z-10">
-        <h1 className="text-white text-2xl font-bold">DRLs Direct Configurator</h1>
-        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-          <Dropdown
-            options={carBrands}
-            value={selectedBrand}
-            onChange={(e) => {
-              setSelectedBrand(e.target.value)
-              setSelectedModel(carModels[e.target.value as keyof typeof carModels][0])
-            }}
-            label="Brand"
-            className="w-full md:w-40"
-          />
-          <Dropdown
-            options={carModels[selectedBrand as keyof typeof carModels]}
-            value={selectedModel}
-            onChange={(e) => setSelectedModel(e.target.value)}
-            label="Model"
-            className="w-full md:w-40"
-          />
+      <nav className="bg-black bg-opacity-80 backdrop-blur-sm p-4 flex justify-between items-center z-10">
+        <Image 
+          src="/logo.png" 
+          alt="DRLs Direct Logo" 
+          width={150} 
+          height={50}
+          className="object-contain"
+        />
+        <div className="flex justify-end">
+          <button
+            onClick={() => setShowVehicleSelector(true)}
+            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all duration-200 flex items-center gap-2"
+          >
+            <Car size={20} />
+            <span className="hidden md:inline">Change Vehicle</span>
+            <span className="text-white/60">
+              {selectedBrand} {selectedModel}
+            </span>
+          </button>
         </div>
       </nav>
+
+      {/* Vehicle Selector Modal */}
+      {showVehicleSelector && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-black/90 rounded-2xl border border-white/10 p-6 w-full max-w-md">
+            <div className="space-y-6">
+              <h2 className="text-white text-xl font-bold">Select Vehicle</h2>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-white/60 text-sm">Brand</label>
+                  <select
+                    value={tempBrand}
+                    onChange={(e) => {
+                      setTempBrand(e.target.value)
+                      setTempModel(carModels[e.target.value as keyof typeof carModels][0])
+                    }}
+                    className="w-full bg-white/5 text-white border border-white/10 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {carBrands.map(brand => (
+                      <option key={brand} value={brand} className="bg-black">
+                        {brand}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-white/60 text-sm">Model</label>
+                  <select
+                    value={tempModel}
+                    onChange={(e) => setTempModel(e.target.value)}
+                    className="w-full bg-white/5 text-white border border-white/10 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {carModels[tempBrand as keyof typeof carModels].map(model => (
+                      <option key={model} value={model} className="bg-black">
+                        {model}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setShowVehicleSelector(false)}
+                  className="flex-1 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedBrand(tempBrand)
+                    setSelectedModel(tempModel)
+                    setShowVehicleSelector(false)
+                  }}
+                  className="flex-1 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200"
+                >
+                  Load Vehicle
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="relative flex-1 flex">
