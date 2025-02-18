@@ -48,11 +48,11 @@ export default function StartScreen({ onStartConfiguration }: StartScreenProps) 
 
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
-      {/* Background Image with Fade */}
+      {/* Background mit subtiler Zoom-Animation */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isLoaded ? 1 : 0 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
+        initial={{ opacity: 0, scale: 1.05 }}
+        animate={{ opacity: isLoaded ? 1 : 0, scale: 1 }}
+        transition={{ duration: 1.8, ease: [0.45, 0, 0.55, 1] }}
         className="absolute inset-0"
       >
         <Image
@@ -64,44 +64,84 @@ export default function StartScreen({ onStartConfiguration }: StartScreenProps) 
           sizes="100vw"
           quality={100}
         />
-        <div className="absolute inset-0 bg-black bg-opacity-50" />
+        {/* Dynamischer Overlay */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/50 to-black/80"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 2 }}
+        />
       </motion.div>
 
-      {/* Content */}
+      {/* Content Container */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
-        transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
-        className="relative z-10 h-full flex flex-col items-center justify-center px-4"
+        className="relative h-full flex flex-col items-center justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 0.3 }}
       >
-        <motion.h1
+        {/* Logo & Title Group */}
+        <motion.div
+          className="text-center space-y-8 mb-16"
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
-          transition={{ duration: 1, delay: 0.8 }}
-          className="text-white text-5xl md:text-7xl font-bold mb-4 text-center"
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.5 }}
         >
-          DRLs Direct
-        </motion.h1>
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="text-white/80 text-xl md:text-2xl mb-12 text-center"
-        >
-          3D Configurator
-        </motion.h2>
+          {/* Logo */}
+          <motion.div
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+          >
+            <Image
+              src="/logo.png"
+              alt="DRLs Direct Logo"
+              width={140}
+              height={140}
+              className="mx-auto drop-shadow-2xl"
+            />
+          </motion.div>
+
+          {/* Title mit metallischem Effekt */}
+          <div className="space-y-4 text-center">
+            <h1 className="text-5xl sm:text-6xl md:text-8xl font-bold whitespace-nowrap
+                       bg-gradient-to-r from-[#9f9f9f] via-[#f5f5f5] to-[#9f9f9f]
+                       text-transparent bg-clip-text
+                       animate-subtle-shimmer
+                       drop-shadow-[0_2px_12px_rgba(255,255,255,0.15)]">
+              DRLs Direct
+            </h1>
+            <p className="text-xl sm:text-2xl text-gray-300 font-light tracking-wide">
+              3D Configurator
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Start Button mit Shine-Effekt */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 20 }}
-          transition={{ duration: 1, delay: 1.2 }}
-          className="flex flex-col sm:flex-row gap-4"
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.9 }}
         >
           <button
             onClick={() => setShowModelSelector(true)}
-            className="px-8 py-3 bg-gradient-to-br from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 text-white rounded-full transition-all duration-200 flex items-center gap-2"
+            className="group relative px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-red-700 to-red-900
+                     rounded-xl text-white text-base sm:text-lg font-medium
+                     transition-all duration-300
+                     hover:from-red-600 hover:to-red-800
+                     hover:shadow-[0_0_20px_rgba(255,0,0,0.3)]
+                     overflow-hidden"
           >
-            <Car size={24} />
-            Start Configuration
+            {/* Shine Overlay */}
+            <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent
+                          translate-x-[-150%] group-hover:translate-x-[150%] 
+                          transition-transform duration-700 ease-out" />
+            
+            {/* Button Content */}
+            <div className="relative flex items-center space-x-2 sm:space-x-3">
+              <Car className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span>Start Configuration</span>
+            </div>
           </button>
         </motion.div>
       </motion.div>

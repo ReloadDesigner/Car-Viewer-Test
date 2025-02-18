@@ -31,3 +31,24 @@ body {
 canvas {
   height: 100% !important;
 }
+
+@keyframes shimmer {
+  0% { background-position: 200% 50%; }
+  100% { background-position: -200% 50%; }
+}
+
+.animate-shimmer {
+  background-size: 400% auto;
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+@keyframes subtle-shimmer {
+  0% { background-position: 100% 50%; }
+  50% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+.animate-subtle-shimmer {
+  background-size: 200% auto;
+  animation: subtle-shimmer 8s ease-in-out infinite;
+}
