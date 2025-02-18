@@ -1,7 +1,7 @@
 'use client'
 
-import React, { Suspense, useState, useEffect } from 'react'
-import { Canvas } from '@react-three/fiber'
+import React, { Suspense, useState, useEffect, useRef } from 'react'
+import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows, ACESFilmicToneMapping } from '@react-three/drei'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Camera, Palette, Car, SunDim, PaintBucket, CircleDot, Lightbulb, Layers, Component, GripHorizontal, Baseline } from 'lucide-react'
@@ -52,6 +52,36 @@ const environmentPresets = [
   { name: 'Warehouse', value: 'warehouse' },
   { name: 'City', value: 'city' },
 ] as const;
+
+// Camera Animation Component
+function CameraAnimation() {
+  const { camera } = useThree()
+  const initialPos = useRef(new THREE.Vector3(15, 5, 15))
+  const targetPos = useRef(new THREE.Vector3(5, 2, 5))
+  const animationProgress = useRef(0)
+  const isAnimating = useRef(true)
+
+  useFrame((state, delta) => {
+    if (isAnimating.current && animationProgress.current < 1) {
+      animationProgress.current += delta * 0.3 // Langsamere Animation
+      
+      // Smooth easing
+      const progress = 1 - Math.pow(1 - animationProgress.current, 4)
+      
+      camera.position.lerpVectors(
+        initialPos.current,
+        targetPos.current,
+        progress
+      )
+
+      if (animationProgress.current >= 1) {
+        isAnimating.current = false
+      }
+    }
+  })
+
+  return null
+}
 
 export default function Configurator() {
   const [selectedBrand, setSelectedBrand] = useState(carBrands[0])
@@ -280,7 +310,7 @@ export default function Configurator() {
         <div className="absolute inset-0">
           <Canvas 
             shadows 
-            camera={{ position: [5, 2, 5], fov: isMobile ? 65 : 50 }}
+            camera={{ position: [15, 5, 15], fov: isMobile ? 65 : 50 }}
             gl={{ 
               toneMapping: THREE.ACESFilmicToneMapping,
               toneMappingExposure: 0.6,
@@ -303,6 +333,7 @@ export default function Configurator() {
                 animate={{ opacity: isModelLoading ? 0 : 1 }}
                 transition={{ duration: 0.5 }}
               >
+                <CameraAnimation />
                 <CarModel
                   config={carConfig}
                   bodyColor={bodyColor ?? originalColors.body ?? '#CCCCCC'}
