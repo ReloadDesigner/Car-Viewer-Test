@@ -4,7 +4,7 @@ import React, { Suspense, useState, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows, ACESFilmicToneMapping } from '@react-three/drei'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Camera, Palette, Car, SunDim, PaintBucket, CircleDot, Lightbulb, Layers, Component, GripHorizontal, Baseline } from 'lucide-react'
+import { Camera, Palette, Car, SunDim, PaintBucket, CircleDot, Lightbulb, Layers, Component, GripHorizontal, Baseline, RotateCw } from 'lucide-react'
 import * as THREE from 'three'
 import CarModel from './CarModel'
 import Dropdown from './Dropdown'
@@ -83,6 +83,62 @@ function CameraAnimation() {
   return null
 }
 
+// Auto-Rotate Component
+function AutoRotate({ 
+  isEnabled,
+  config,
+  bodyColor,
+  wheelColor,
+  drlColor,
+  interiorMainColor,
+  interiorSecondaryColor,
+  setOriginalColors
+}: { 
+  isEnabled: boolean;
+  config: CarConfig;
+  bodyColor: string;
+  wheelColor: string;
+  drlColor: string;
+  interiorMainColor: string;
+  interiorSecondaryColor: string;
+  setOriginalColors: (colors: {
+    body: string | null;
+    wheel: string | null;
+    drl: string;
+    interiorMain: string | null;
+    interiorSecondary: string | null;
+  }) => void;
+}) {
+  const { scene } = useThree()
+  const rotationGroup = useRef<THREE.Group>()
+  
+  useEffect(() => {
+    if (rotationGroup.current) {
+      rotationGroup.current.position.set(0, 0, 0)
+    }
+  }, [])
+
+  useFrame((state, delta) => {
+    if (isEnabled && rotationGroup.current) {
+      rotationGroup.current.rotation.y += delta * 0.5
+    }
+  })
+
+  return (
+    <group ref={rotationGroup}>
+      <CarModel
+        config={config}
+        bodyColor={bodyColor}
+        wheelColor={wheelColor}
+        drlColor={drlColor}
+        interiorMainColor={interiorMainColor}
+        interiorSecondaryColor={interiorSecondaryColor}
+        setOriginalColors={setOriginalColors}
+      />
+    </group>
+  )
+}
+
 export default function Configurator() {
   const [selectedBrand, setSelectedBrand] = useState(carBrands[0])
   const [selectedModel, setSelectedModel] = useState(carModels[carBrands[0]][0])
@@ -107,6 +163,7 @@ export default function Configurator() {
   const [tempBrand, setTempBrand] = useState(selectedBrand)
   const [tempModel, setTempModel] = useState(selectedModel)
   const [isModelLoading, setIsModelLoading] = useState(false)
+  const [autoRotate, setAutoRotate] = useState(false)
 
   useEffect(() => {
     const checkMobile = () => {
@@ -334,7 +391,8 @@ export default function Configurator() {
                 transition={{ duration: 0.5 }}
               >
                 <CameraAnimation />
-                <CarModel
+                <AutoRotate 
+                  isEnabled={autoRotate}
                   config={carConfig}
                   bodyColor={bodyColor ?? originalColors.body ?? '#CCCCCC'}
                   wheelColor={wheelColor ?? originalColors.wheel ?? '#333333'}
@@ -394,6 +452,19 @@ export default function Configurator() {
             >
               <Camera size={20} />
               <span className={isMobile ? 'hidden' : 'hidden md:inline'}>Screenshot</span>
+            </button>
+            <button
+              onClick={() => setAutoRotate(!autoRotate)}
+              className={`
+                ${autoRotate ? 'bg-red-600 hover:bg-red-700' : 'bg-black/40 hover:bg-black/60'} 
+                text-white px-4 py-2 rounded-full transition-all duration-200 backdrop-blur-sm 
+                flex items-center gap-2 shadow-lg border border-white/10
+              `}
+            >
+              <RotateCw size={20} className={autoRotate ? 'animate-spin' : ''} />
+              <span className={isMobile ? 'hidden' : 'hidden md:inline'}>
+                {autoRotate ? 'Stop Rotation' : 'Auto Rotate'}
+              </span>
             </button>
           </div>
 
