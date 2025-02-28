@@ -6,13 +6,12 @@ import StartScreen from '../components/StartScreen'
 
 export default function Home() {
   const [showConfigurator, setShowConfigurator] = useState(false)
+  const [selectedBrand, setSelectedBrand] = useState('BMW')
+  const [selectedModel, setSelectedModel] = useState('M3')
 
-  const handleStartConfiguration = () => {
-    setShowConfigurator(true)
-  }
-
-  const handleLoadConfiguration = () => {
-    // TODO: Implement loading saved configuration
+  const handleStartConfiguration = (brand: string, model: string) => {
+    setSelectedBrand(brand)
+    setSelectedModel(model)
     setShowConfigurator(true)
   }
 
@@ -21,10 +20,12 @@ export default function Home() {
       {!showConfigurator ? (
         <StartScreen
           onStartConfiguration={handleStartConfiguration}
-          onLoadConfiguration={handleLoadConfiguration}
         />
       ) : (
-        <Configurator />
+        <Configurator 
+          initialBrand={selectedBrand}
+          initialModel={selectedModel}
+        />
       )}
     </main>
   )

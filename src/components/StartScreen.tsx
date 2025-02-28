@@ -8,12 +8,13 @@ import { Car } from 'lucide-react'
 import LoadButton from './LoadButton'
 
 interface StartScreenProps {
-  onStartConfiguration: () => void
+  onStartConfiguration: (brand: string, model: string) => void
 }
 
 const carBrands = ['BMW', 'Audi', 'Mercedes']
+
 const carModels = {
-  BMW: ['M3', 'M4', 'X5'],
+  BMW: ['M2 LCI', 'M3', 'M4', 'X5'],
   Audi: ['A4', 'A6', 'Q5'],
   Mercedes: ['C-Class', 'E-Class', 'GLC'],
 }
@@ -38,7 +39,7 @@ export default function StartScreen({ onStartConfiguration }: StartScreenProps) 
     // Warte einen kurzen Moment für die Button-Animation
     await new Promise(resolve => setTimeout(resolve, 300))
     
-    onStartConfiguration()
+    onStartConfiguration(selectedBrand, selectedModel)
     setShowModelSelector(false)
   }
 

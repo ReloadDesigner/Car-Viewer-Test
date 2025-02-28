@@ -7,6 +7,23 @@ export interface CarConfig {
     interiorMain: string;
     interiorSecondary: string;
   };
+  // Neue Eigenschaften für modellspezifische Anpassungen
+  scale?: number; // Skalierungsfaktor für das Modell
+  position?: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  rotation?: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  cameraPosition?: {
+    x: number;
+    y: number;
+    z: number;
+  };
 }
 
 export interface ModelConfig {

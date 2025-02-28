@@ -13,17 +13,24 @@ import ConfigSection from './ConfigSection'
 import LoadButton from './LoadButton'
 import { CarConfig, ModelConfig } from '../types/carConfig'
 import { m3_f80Config } from '../config/modelConfigs/bmwConfigs/m3_f80'
+import { m2_lciConfig } from '../config/modelConfigs/bmwConfigs/m2_lci';
 import Image from 'next/image'
+
+interface ConfiguratorProps {
+  initialBrand: string;
+  initialModel: string;
+}
 
 const carBrands = ['BMW', 'Audi', 'Mercedes']
 
 const carModels = {
-  BMW: ['M3', 'M4', 'X5'],
+  BMW: ['M2 LCI', 'M3', 'M4', 'X5'],
   Audi: ['A4', 'A6', 'Q5'],
   Mercedes: ['C-Class', 'E-Class', 'GLC'],
 }
 
 const carConfigs: ModelConfig = {
+  'BMW_M2 LCI': m2_lciConfig, 
   'BMW_M3': m3_f80Config,
   'BMW_M4': m3_f80Config, // Temporär das gleiche Modell für M4
   'BMW_X5': m3_f80Config, // Temporär das gleiche Modell für X5
@@ -139,10 +146,10 @@ function AutoRotate({
   )
 }
 
-export default function Configurator() {
-  const [selectedBrand, setSelectedBrand] = useState(carBrands[0])
-  const [selectedModel, setSelectedModel] = useState(carModels[carBrands[0]][0])
-  const [carConfig, setCarConfig] = useState<CarConfig>(carConfigs[`${carBrands[0]}_${carModels[carBrands[0]][0]}`])
+export default function Configurator({ initialBrand, initialModel }: ConfiguratorProps) {
+  const [selectedBrand, setSelectedBrand] = useState(initialBrand)
+  const [selectedModel, setSelectedModel] = useState(initialModel)
+  const [carConfig, setCarConfig] = useState<CarConfig>(carConfigs[`${initialBrand}_${initialModel}`])
   const [originalColors, setOriginalColors] = useState({
     body: null,
     wheel: null,

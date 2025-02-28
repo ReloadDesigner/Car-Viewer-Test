@@ -144,12 +144,36 @@ export default function CarModel({
 
   useEffect(() => {
     if (groupRef.current) {
+      // Modellspezifische Skalierung anwenden
+      if (config.scale) {
+        groupRef.current.scale.set(config.scale, config.scale, config.scale);
+      }
+
+      // Modellspezifische Position anwenden
+      if (config.position) {
+        const { x, y, z } = config.position;
+        groupRef.current.position.set(x, y, z);
+      }
+
+      // Modellspezifische Rotation anwenden
+      if (config.rotation) {
+        const { x, y, z } = config.rotation;
+        groupRef.current.rotation.set(
+          x * (Math.PI / 180), 
+          y * (Math.PI / 180), 
+          z * (Math.PI / 180)
+        );
+      }
+
       const box = new THREE.Box3().setFromObject(groupRef.current)
       const center = box.getCenter(new THREE.Vector3())
       const size = box.getSize(new THREE.Vector3())
 
       // Zentriere das Modell horizontal, aber lass es auf dem Boden
-      groupRef.current.position.set(-center.x, -box.min.y, -center.z)
+      // Nur anwenden, wenn keine spezifische Position definiert ist
+      if (!config.position) {
+        groupRef.current.position.set(-center.x, -box.min.y, -center.z)
+      }
 
       // Berechne die optimale Kameraposition
       const fov = camera.fov * (Math.PI / 180)
@@ -157,8 +181,16 @@ export default function CarModel({
       const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.2
 
       // Setze die Kamera auf eine Position, die das gesamte Modell zeigt
-      camera.position.set(distance * 0.8, distance * 0.4, distance * 0.8)
-      camera.lookAt(new THREE.Vector3(0, size.y / 4, 0))
+      // Nur anwenden, wenn keine spezifische Kameraposition definiert ist
+      if (!config.cameraPosition) {
+        camera.position.set(distance * 0.8, distance * 0.4, distance * 0.8)
+        camera.lookAt(new THREE.Vector3(0, size.y / 4, 0))
+      } else {
+        const { x, y, z } = config.cameraPosition;
+        camera.position.set(x, y, z);
+        camera.lookAt(new THREE.Vector3(0, size.y / 4, 0))
+      }
+      
       camera.updateProjectionMatrix()
 
       // Optimiere die Geometrie
@@ -173,7 +205,7 @@ export default function CarModel({
         }
       })
     }
-  }, [scene, camera])
+  }, [scene, camera, config])
 
   return (
     <group ref={groupRef}>
