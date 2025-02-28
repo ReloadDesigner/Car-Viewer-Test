@@ -88,6 +88,23 @@ export default function CarModel({
       interiorSecondary: null,
     }
 
+    // DEBUG: Ausgabe aller Materialnamen für das A45 AMG-Modell
+    console.log("Verfügbare Materialnamen im Modell:");
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        console.log(`Mesh Name: ${child.name}`);
+        if (child.material) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach((mat, index) => {
+              console.log(`  Material ${index}: ${mat.name}`);
+            });
+          } else {
+            console.log(`  Material: ${child.material.name}`);
+          }
+        }
+      }
+    });
+
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         if (child.name === config.materials.body) {

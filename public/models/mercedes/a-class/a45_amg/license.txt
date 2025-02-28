@@ -1,0 +1,11 @@
+Model Information:
+* title:	Mercedes-Benz A45 AMG 2018
+* source:	https://sketchfab.com/3d-models/mercedes-benz-a45-amg-2018-9482f251f9c34a6e91d7777db5934cfc
+* author:	Lexyc16 (https://sketchfab.com/Lexyc16)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Mercedes-Benz A45 AMG 2018" (https://sketchfab.com/3d-models/mercedes-benz-a45-amg-2018-9482f251f9c34a6e91d7777db5934cfc) by Lexyc16 (https://sketchfab.com/Lexyc16) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)

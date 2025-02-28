@@ -14,6 +14,7 @@ import LoadButton from './LoadButton'
 import { CarConfig, ModelConfig } from '../types/carConfig'
 import { m3_f80Config } from '../config/modelConfigs/bmwConfigs/m3_f80'
 import { m2_lciConfig } from '../config/modelConfigs/bmwConfigs/m2_lci';
+import { a45_amgConfig } from '../config/modelConfigs/mercedesConfigs/a-class_a45_amg';
 import Image from 'next/image'
 
 interface ConfiguratorProps {
@@ -26,17 +27,18 @@ const carBrands = ['BMW', 'Audi', 'Mercedes']
 const carModels = {
   BMW: ['M2 LCI', 'M3', 'M4', 'X5'],
   Audi: ['A4', 'A6', 'Q5'],
-  Mercedes: ['C-Class', 'E-Class', 'GLC'],
+  Mercedes: ['A-Class (A45 AMG)', 'C-Class', 'E-Class', 'GLC'],
 }
 
 const carConfigs: ModelConfig = {
-  'BMW_M2 LCI': m2_lciConfig, 
+  'BMW_M2 LCI': m2_lciConfig,
   'BMW_M3': m3_f80Config,
   'BMW_M4': m3_f80Config, // Temporär das gleiche Modell für M4
   'BMW_X5': m3_f80Config, // Temporär das gleiche Modell für X5
   'Audi_A4': m3_f80Config, // Temporär das gleiche Modell für A4
   'Audi_A6': m3_f80Config, // Temporär das gleiche Modell für A6
   'Audi_Q5': m3_f80Config, // Temporär das gleiche Modell für Q5
+  'Mercedes_A-Class (A45 AMG)': a45_amgConfig,
   'Mercedes_C-Class': m3_f80Config, // Temporär das gleiche Modell für C-Class
   'Mercedes_E-Class': m3_f80Config, // Temporär das gleiche Modell für E-Class
   'Mercedes_GLC': m3_f80Config, // Temporär das gleiche Modell für GLC
@@ -165,6 +167,8 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
   const [showConfigurator, setShowConfigurator] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [selectedEnvironment, setSelectedEnvironment] = useState<typeof environmentPresets[number]['value']>('warehouse')
+  const [environmentBrightness, setEnvironmentBrightness] = useState(1.0) // Default brightness at 100%
+  const [maxEnvironmentBrightness] = useState(1.0) // Maximum brightness value (current brightness)
   const [showCustomColorPicker, setShowCustomColorPicker] = useState(false)
   const [showVehicleSelector, setShowVehicleSelector] = useState(false)
   const [tempBrand, setTempBrand] = useState(selectedBrand)
@@ -409,7 +413,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                   setOriginalColors={setOriginalColors}
                 />
               </motion.group>
-              <Environment preset={selectedEnvironment} background={false} />
+              <Environment preset={selectedEnvironment} background={false} environmentIntensity={environmentBrightness} />
               <ContactShadows 
                 rotation-x={Math.PI / 2}
                 position={[0, -0.0001, 0]}
@@ -538,7 +542,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                       <select
                         value={selectedEnvironment}
                         onChange={(e) => setSelectedEnvironment(e.target.value as typeof selectedEnvironment)}
-                        className="w-full bg-black/60 text-white text-sm py-1.5 px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/20 border border-white/10"
+                        className="w-full bg-black/60 text-white text-sm py-1.5 px-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/20 border border-white/10 mb-2"
                         style={{ colorScheme: 'dark' }}
                       >
                         {environmentPresets.map((preset) => (
@@ -551,6 +555,24 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                           </option>
                         ))}
                       </select>
+                      
+                      {/* Brightness Slider */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-center text-white/70 text-xs">
+                          <span>Brightness</span>
+                          <span>{Math.round((environmentBrightness / maxEnvironmentBrightness) * 100)}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0.2"
+                          max={maxEnvironmentBrightness}
+                          step="0.01"
+                          value={environmentBrightness}
+                          onChange={(e) => setEnvironmentBrightness(parseFloat(e.target.value))}
+                          className="w-full accent-red-600"
+                          style={{ colorScheme: 'dark' }}
+                        />
+                      </div>
                     </div>
 
                     {/* Color Configuration Sections */}

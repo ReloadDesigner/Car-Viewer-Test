@@ -16,7 +16,7 @@ const carBrands = ['BMW', 'Audi', 'Mercedes']
 const carModels = {
   BMW: ['M2 LCI', 'M3', 'M4', 'X5'],
   Audi: ['A4', 'A6', 'Q5'],
-  Mercedes: ['C-Class', 'E-Class', 'GLC'],
+  Mercedes: ['A-Class (A45 AMG)', 'C-Class', 'E-Class', 'GLC'],
 }
 
 export default function StartScreen({ onStartConfiguration }: StartScreenProps) {
