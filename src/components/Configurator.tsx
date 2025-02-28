@@ -1,9 +1,10 @@
-'use client'
+﻿'use client'
 
 import React, { Suspense, useState, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows, ACESFilmicToneMapping } from '@react-three/drei'
 import { motion, AnimatePresence } from 'framer-motion'
+import { motion as motion3d } from 'framer-motion-3d'
 import { Camera, Palette, Car, SunDim, PaintBucket, CircleDot, Lightbulb, Layers, Component, GripHorizontal, Baseline, RotateCw } from 'lucide-react'
 import * as THREE from 'three'
 import CarModel from './CarModel'
@@ -175,6 +176,9 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
   const [tempModel, setTempModel] = useState(selectedModel)
   const [isModelLoading, setIsModelLoading] = useState(false)
   const [autoRotate, setAutoRotate] = useState(false)
+  const [modelTransitioning, setModelTransitioning] = useState(false) // Track when model is transitioning
+  const [slideDirection, setSlideDirection] = useState<'none' | 'out' | 'in'>('none') // Track slide animation phase
+  const [initialPosition, setInitialPosition] = useState<number | null>(null) // Track initial position for slide-in
 
   useEffect(() => {
     const checkMobile = () => {
@@ -250,23 +254,37 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
   };
 
   const handleLoadModel = async () => {
+    // Start slide-out animation
+    setSlideDirection('out')
+    setModelTransitioning(true)
     setIsModelLoading(true)
     setShowVehicleSelector(false)
     
-    // Warte einen kurzen Moment für die Button-Animation
-    await new Promise(resolve => setTimeout(resolve, 300))
+    // Wait for slide-out to complete
+    await new Promise(resolve => setTimeout(resolve, 700))
     
+    // Update model configuration while out of view
     const configKey = `${tempBrand}_${tempModel}` as keyof typeof carConfigs
     setSelectedBrand(tempBrand)
     setSelectedModel(tempModel)
     setCarConfig(carConfigs[configKey] || carConfigs['BMW_M3'])
     
-    // Warte auf das nächste Frame für smooth transition
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        setIsModelLoading(false)
-      }, 500)
-    })
+    // Set initial position for slide-in (off to the left)
+    setInitialPosition(-10)
+    
+    // Small delay to process model and for user to notice the change
+    await new Promise(resolve => setTimeout(resolve, 200))
+    
+    // Start slide-in animation
+    setSlideDirection('in')
+    
+    // Complete the transition after slide-in completes
+    setTimeout(() => {
+      setSlideDirection('none')
+      setInitialPosition(null)
+      setModelTransitioning(false)
+      setIsModelLoading(false)
+    }, 800)
   }
 
   return (
@@ -396,10 +414,22 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
             <color attach="background" args={['#111']} />
             <fog attach="fog" args={['#111', isMobile ? 5 : 10, isMobile ? 15 : 20]} />
             <Suspense fallback={null}>
-              <motion.group
-                initial={{ opacity: 0 }}
-                animate={{ opacity: isModelLoading ? 0 : 1 }}
-                transition={{ duration: 0.5 }}
+              <motion3d.group
+                initial={{ x: initialPosition !== null ? initialPosition : 0, scale: 1 }}
+                animate={{
+                  x: slideDirection === 'out' ? 10 : // Slide far to the right
+                     slideDirection === 'in' ? 0 : // Slide to center position
+                     0, // Default position
+                  scale: slideDirection === 'out' ? 0.7 : 1, // Scale down when sliding out
+                  opacity: slideDirection === 'out' ? 0.2 : 1, // More fade when sliding out
+                  rotateY: slideDirection === 'out' ? 0.4 : 0 // Slight rotation when sliding out
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 70,
+                  damping: 15,
+                  mass: 1.2
+                }}
               >
                 <CameraAnimation />
                 <AutoRotate 
@@ -412,7 +442,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                   interiorSecondaryColor={interiorSecondaryColor ?? originalColors.interiorSecondary ?? '#333333'}
                   setOriginalColors={setOriginalColors}
                 />
-              </motion.group>
+              </motion3d.group>
               <Environment preset={selectedEnvironment} background={false} environmentIntensity={environmentBrightness} />
               <ContactShadows 
                 rotation-x={Math.PI / 2}
