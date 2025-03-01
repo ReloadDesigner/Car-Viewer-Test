@@ -166,8 +166,45 @@ export default function CarModel({
         if (child instanceof THREE.Mesh) {
           child.material.needsUpdate = true
           
-          // DRL werden immer nach Mesh-Namen gesucht, unabhängig von der Konfiguration
-          if (child.name.includes(config.materials.drl)) {
+          // Bedingungsvariablen für klarere Logik
+          const isDrlMesh = config.drlConfig && config.drlConfig.meshFilter.includes(child.name);
+          const isStandardDrl = !config.drlConfig && child.name.includes(config.materials.drl);
+          const isWheelByMeshName = child.name === config.materials.wheel;
+          const isWheelByMaterialName = config.useMaterialNameInsteadOfMeshName && 
+                                       child.material && 
+                                       !Array.isArray(child.material) && 
+                                       child.material.name === config.materials.wheel;
+          const isGlassByMeshName = config.materials.glass && child.name === config.materials.glass;
+          
+          // Debug-Ausgabe für Räder
+          if (isWheelByMeshName) {
+            console.log(`Felgen-Mesh gefunden: ${child.name}`);
+            if (child.material) {
+              console.log(`Material der Felge: ${Array.isArray(child.material) ? 'Array von Materialien' : child.material.name}`);
+            }
+          }
+          
+          // Debug-Ausgabe für Glas
+          if (isGlassByMeshName) {
+            console.log(`Glas-Mesh gefunden: ${child.name}`);
+            if (child.material) {
+              console.log(`Material des Glases: ${Array.isArray(child.material) ? 'Array von Materialien' : child.material.name}`);
+            }
+          }
+          
+          // Spezielle DRL-Konfiguration für Modelle mit bestimmten Filter-Einstellungen
+          if (isDrlMesh) {
+            const drlMaterial = new THREE.ShaderMaterial({
+              uniforms: drlUniforms,
+              vertexShader: drlVertexShader,
+              fragmentShader: drlFragmentShader,
+              transparent: true,
+              blending: THREE.AdditiveBlending
+            });
+            child.material = drlMaterial;
+          } 
+          // Standard-DRL-Logik für Modelle ohne spezielle drlConfig
+          else if (isStandardDrl) {
             const drlMaterial = new THREE.ShaderMaterial({
               uniforms: drlUniforms,
               vertexShader: drlVertexShader,
@@ -177,14 +214,48 @@ export default function CarModel({
             });
             child.material = drlMaterial;
           }
-          // Unterschiedliche Logik je nach Modell-Konfiguration für die anderen Materialien
+          // Direkter Zugriff auf Felgen durch Mesh-Namen - höhere Priorität als andere Methoden
+          else if (isWheelByMeshName) {
+            if (child.material) {
+              if (Array.isArray(child.material)) {
+                child.material.forEach(mat => {
+                  mat.color.set(wheelColor);
+                });
+                console.log(`Felgenfarbe gesetzt (Array von Materialien) für Mesh: ${child.name}`);
+              } else {
+                child.material.color.set(wheelColor);
+                console.log(`Felgenfarbe gesetzt für Mesh: ${child.name}, Material: ${child.material.name}`);
+              }
+            }
+          }
+          // Direkter Zugriff auf Glas durch Mesh-Namen - höhere Priorität als andere Methoden
+          else if (isGlassByMeshName) {
+            if (child.material) {
+              const glassColor = config.initialGlassColor || '#000000'; // Schwarz als Standardfarbe für Glas
+              if (Array.isArray(child.material)) {
+                child.material.forEach(mat => {
+                  mat.color.set(glassColor);
+                  mat.transparent = true;
+                  mat.opacity = 0.7; // Leichte Transparenz für Glas
+                });
+                console.log(`Glasfarbe gesetzt (Array von Materialien) für Mesh: ${child.name}`);
+              } else {
+                child.material.color.set(glassColor);
+                child.material.transparent = true;
+                child.material.opacity = 0.7; // Leichte Transparenz für Glas
+                console.log(`Glasfarbe gesetzt für Mesh: ${child.name}, Material: ${child.material.name}`);
+              }
+            }
+          }
+          // Andere Material-Zuweisungen
           else if (config.useMaterialNameInsteadOfMeshName && child.material && !Array.isArray(child.material)) {
             // Suche nach Material-Namen (speziell für m2_lci)
             if (child.material.name === config.materials.body) {
               child.material.color.set(bodyColor)
             } 
-            else if (child.material.name === config.materials.wheel) {
+            else if (isWheelByMaterialName) {
               child.material.color.set(wheelColor)
+              console.log(`Felgenfarbe gesetzt für Material: ${child.material.name} an Mesh: ${child.name}`);
             } 
             else if (child.material.name === config.materials.interiorMain) {
               child.material.color.set(interiorMainColor)
@@ -200,9 +271,7 @@ export default function CarModel({
             if (child.name === config.materials.body) {
               child.material.color.set(bodyColor)
             } 
-            else if (child.name === config.materials.wheel) {
-              child.material.color.set(wheelColor)
-            } 
+            // Wheel wird oben mit höherer Priorität behandelt
             else if (child.name === config.materials.interiorMain) {
               child.material.color.set(interiorMainColor)
             }
