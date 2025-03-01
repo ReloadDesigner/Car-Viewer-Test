@@ -15,7 +15,6 @@ import LoadButton from './LoadButton'
 import { CarConfig, ModelConfig } from '../types/carConfig'
 import { m4_f82Config } from '../config/modelConfigs/bmwConfigs/m4_f82'
 import { m8_f92Config } from '../config/modelConfigs/bmwConfigs/m8_f92';
-import { a45_amgConfig } from '../config/modelConfigs/mercedesConfigs/a-class_a45_amg';
 import { gtrR35NismoConfig } from '../config/modelConfigs/nissanConfigs/gt-r_r35_nismo';
 import Image from 'next/image'
 
@@ -29,7 +28,7 @@ const carBrands = ['Audi', 'BMW', 'Mercedes', 'Nissan']
 const carModels = {
   BMW: ['4 Series/M4 (F3X/F8X)', '8 Series/M8 (F9X)', 'X5'],
   Audi: ['A4', 'A6', 'Q5'],
-  Mercedes: ['A-Class (A45 AMG)', 'C-Class', 'E-Class', 'GLC'],
+  Mercedes: ['C-Class', 'E-Class', 'GLC'],
   Nissan: ['GT-R (R35/Nismo)'],
 }
 
@@ -40,7 +39,6 @@ const carConfigs: ModelConfig = {
   'Audi_A4': m4_f82Config, // Temporär das gleiche Modell für A4
   'Audi_A6': m4_f82Config, // Temporär das gleiche Modell für A6
   'Audi_Q5': m4_f82Config, // Temporär das gleiche Modell für Q5
-  'Mercedes_A-Class (A45 AMG)': a45_amgConfig,
   'Mercedes_C-Class': m4_f82Config, // Temporär das gleiche Modell für C-Class
   'Mercedes_E-Class': m4_f82Config, // Temporär das gleiche Modell für E-Class
   'Mercedes_GLC': m4_f82Config, // Temporär das gleiche Modell für GLC
@@ -182,6 +180,8 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
   const [slideDirection, setSlideDirection] = useState<'none' | 'out' | 'in'>('none') // Track slide animation phase
   const [initialPosition, setInitialPosition] = useState<number | null>(null) // Track initial position for slide-in
   const [showResetColorsDialog, setShowResetColorsDialog] = useState(false)
+  const [showDisclaimerDialog, setShowDisclaimerDialog] = useState(false)
+  const [showLicenseInfo, setShowLicenseInfo] = useState(false)
 
   const hasColorChanges = () => {
     return (
@@ -300,6 +300,24 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
       }
     }
   };
+
+  // Disclaimer-Dialog nur beim ersten Besuch anzeigen
+  useEffect(() => {
+    const hasSeenDisclaimer = localStorage.getItem('hasSeenDisclaimer') === 'true'
+    if (!hasSeenDisclaimer && !isModelLoading && !modelTransitioning) {
+      // Kurze Verzögerung, damit der Disclaimer nach vollständigem Laden erscheint
+      const timer = setTimeout(() => {
+        setShowDisclaimerDialog(true)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [isModelLoading, modelTransitioning])
+
+  // Disclaimer als gesehen markieren
+  const acknowledgeDisclaimer = () => {
+    localStorage.setItem('hasSeenDisclaimer', 'true')
+    setShowDisclaimerDialog(false)
+  }
 
   return (
     <div className="w-full h-screen flex flex-col bg-gray-900 overflow-hidden">
@@ -447,6 +465,119 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                     Load Vehicle
                   </LoadButton>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Disclaimer Dialog */}
+      <AnimatePresence>
+        {showDisclaimerDialog && (
+          <motion.div 
+            className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={acknowledgeDisclaimer}
+          >
+            <motion.div 
+              className="bg-slate-900 p-6 rounded-lg max-w-md w-full border border-white/10 shadow-xl"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <h2 className="text-xl font-bold text-white mb-3">Important Notice</h2>
+              <p className="text-gray-300 mb-4">
+                This 3D visualization is for approximate representation only. 
+                Actual colors, materials, and lighting effects may differ from what is displayed 
+                in this model. This simulation is intended as a guide only and does not 
+                represent a binding product representation.
+              </p>
+              <button
+                onClick={acknowledgeDisclaimer}
+                className="w-full px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200"
+              >
+                Understood
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Lizenz-Information Icon */}
+      <div className="absolute bottom-2 right-2 z-40">
+        <button 
+          onClick={() => setShowLicenseInfo(!showLicenseInfo)}
+          className="bg-black/40 hover:bg-black/60 p-2 rounded-full transition-all"
+          title="License Information"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white/70" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2h2a1 1 0 100-2H9z" clipRule="evenodd" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Lizenz-Information Dialog */}
+      <AnimatePresence>
+        {showLicenseInfo && (
+          <motion.div 
+            className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowLicenseInfo(false)}
+          >
+            <motion.div 
+              className="bg-slate-900 p-6 rounded-lg max-w-xl w-full border border-white/10 shadow-xl max-h-[80vh] overflow-y-auto"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-white">License Information</h2>
+                <button 
+                  onClick={() => setShowLicenseInfo(false)}
+                  className="text-white/60 hover:text-white"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="text-gray-300 text-sm space-y-4">
+                <p className="border-b border-white/10 pb-2">
+                  The 3D models in this configurator are subject to the following license terms:
+                </p>
+                
+                <div>
+                  <h3 className="font-semibold mb-1">BMW M4 F82</h3>
+                  <p className="text-xs text-gray-400">
+                    This work is based on "BMW M4 f82" (https://sketchfab.com/3d-models/bmw-m4-f82-8e87379f40fd40dcac0a751e22c1a188) by Black Snow (https://sketchfab.com/BlackSnow02) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold mb-1">BMW M8 F92</h3>
+                  <p className="text-xs text-gray-400">
+                    This work is based on "BMW M8 F92 Coupé Competition" (https://sketchfab.com/3d-models/bmw-m8-f92-coupe-competition-25d5b4f6d13e4217afa09bbf89f8d993) by kevin (ケビン) (https://sketchfab.com/sohyalebret) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold mb-1">Nissan GT-R R35 Nismo</h3>
+                  <p className="text-xs text-gray-400">
+                    This work is based on "Nissan GT-R R35 Nismo | www.vecarz.com" (https://sketchfab.com/3d-models/nissan-gt-r-r35-nismo-wwwvecarzcom-9cfbe4727b7f4af0a11772687c4a1f59) by vecarz (https://sketchfab.com/heynic) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+                  </p>
+                </div>
+                
+                <p className="pt-2 text-xs italic">
+                  All vehicle brands, logos, and model designations are the property of their respective manufacturers and are used here
+                  for informational purposes only. This application is not affiliated with or endorsed by the vehicle manufacturers.
+                </p>
               </div>
             </motion.div>
           </motion.div>
