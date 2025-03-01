@@ -10,7 +10,7 @@ export const a45_amgConfig: CarConfig = {
     interiorSecondary: "a45_amg_interior_secondary" // Platzhalter - muss mit dem tatsächlichen Materialnamen aktualisiert werden
   },
   // Anpassungen für das A45 AMG-Modell
-  scale: 0.2, // Etwas größere Skalierung für bessere Sichtbarkeit
+  scale: 0.18, // Etwas größere Skalierung für bessere Sichtbarkeit
   position: {
     x: 0,
     y: 0, // Leicht nach unten versetzt

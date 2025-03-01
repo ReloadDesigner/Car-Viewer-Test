@@ -19,6 +19,7 @@ interface CarModelProps {
     drl: string;
     interiorMain: string | null;
     interiorSecondary: string | null;
+    glass: string | null;
   }) => void;
 }
 
@@ -86,6 +87,7 @@ export default function CarModel({
       drl: '#FFFFFF',
       interiorMain: null,
       interiorSecondary: null,
+      glass: null,
     }
 
     // DEBUG: Ausgabe aller Materialnamen für das A45 AMG-Modell
@@ -107,17 +109,49 @@ export default function CarModel({
 
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        if (child.name === config.materials.body) {
-          originalColors.body = '#' + child.material.color.getHexString()
-        } 
-        else if (child.name === config.materials.wheel) {
-          originalColors.wheel = '#' + child.material.color.getHexString()
-        } 
-        else if (child.name === config.materials.interiorMain) {
-          originalColors.interiorMain = '#' + child.material.color.getHexString()
-        }
-        else if (child.name === config.materials.interiorSecondary) {
-          originalColors.interiorSecondary = '#' + child.material.color.getHexString()
+        // Unterschiedliche Logik je nach Modell-Konfiguration
+        if (config.useMaterialNameInsteadOfMeshName && child.material && !Array.isArray(child.material)) {
+          // Suche nach Material-Namen (speziell für m2_lci)
+          if (child.material.name === config.materials.body) {
+            originalColors.body = '#' + child.material.color.getHexString()
+          } 
+          else if (child.material.name === config.materials.wheel) {
+            originalColors.wheel = '#' + child.material.color.getHexString()
+          } 
+          else if (child.material.name === config.materials.interiorMain) {
+            originalColors.interiorMain = '#' + child.material.color.getHexString()
+          }
+          else if (child.material.name === config.materials.interiorSecondary) {
+            originalColors.interiorSecondary = '#' + child.material.color.getHexString()
+          }
+          else if (config.materials.glass && child.material.name === config.materials.glass) {
+            originalColors.glass = '#' + child.material.color.getHexString()
+            // Wenn initialGlassColor definiert ist, setze die Glasfarbe sofort
+            if (config.initialGlassColor) {
+              child.material.color.set(config.initialGlassColor);
+            }
+          }
+        } else {
+          // Standard-Logik: Suche nach Mesh-Namen
+          if (child.name === config.materials.body) {
+            originalColors.body = '#' + child.material.color.getHexString()
+          } 
+          else if (child.name === config.materials.wheel) {
+            originalColors.wheel = '#' + child.material.color.getHexString()
+          } 
+          else if (child.name === config.materials.interiorMain) {
+            originalColors.interiorMain = '#' + child.material.color.getHexString()
+          }
+          else if (child.name === config.materials.interiorSecondary) {
+            originalColors.interiorSecondary = '#' + child.material.color.getHexString()
+          }
+          else if (config.materials.glass && child.name === config.materials.glass) {
+            originalColors.glass = '#' + child.material.color.getHexString()
+            // Wenn initialGlassColor definiert ist, setze die Glasfarbe sofort
+            if (config.initialGlassColor) {
+              child.material.color.set(config.initialGlassColor);
+            }
+          }
         }
       }
     })
@@ -132,13 +166,8 @@ export default function CarModel({
         if (child instanceof THREE.Mesh) {
           child.material.needsUpdate = true
           
-          if (child.name === config.materials.body) {
-            child.material.color.set(bodyColor)
-          } 
-          else if (child.name === config.materials.wheel) {
-            child.material.color.set(wheelColor)
-          } 
-          else if (child.name.includes(config.materials.drl)) {
+          // DRL werden immer nach Mesh-Namen gesucht, unabhängig von der Konfiguration
+          if (child.name.includes(config.materials.drl)) {
             const drlMaterial = new THREE.ShaderMaterial({
               uniforms: drlUniforms,
               vertexShader: drlVertexShader,
@@ -148,11 +177,41 @@ export default function CarModel({
             });
             child.material = drlMaterial;
           }
-          else if (child.name === config.materials.interiorMain) {
-            child.material.color.set(interiorMainColor)
-          }
-          else if (child.name === config.materials.interiorSecondary) {
-            child.material.color.set(interiorSecondaryColor)
+          // Unterschiedliche Logik je nach Modell-Konfiguration für die anderen Materialien
+          else if (config.useMaterialNameInsteadOfMeshName && child.material && !Array.isArray(child.material)) {
+            // Suche nach Material-Namen (speziell für m2_lci)
+            if (child.material.name === config.materials.body) {
+              child.material.color.set(bodyColor)
+            } 
+            else if (child.material.name === config.materials.wheel) {
+              child.material.color.set(wheelColor)
+            } 
+            else if (child.material.name === config.materials.interiorMain) {
+              child.material.color.set(interiorMainColor)
+            }
+            else if (child.material.name === config.materials.interiorSecondary) {
+              child.material.color.set(interiorSecondaryColor)
+            }
+            else if (config.materials.glass && child.material.name === config.materials.glass) {
+              child.material.color.set('#000000'); // Schwarze Glasfarbe
+            }
+          } else {
+            // Standard-Logik: Suche nach Mesh-Namen (außer für DRL, die werden oben behandelt)
+            if (child.name === config.materials.body) {
+              child.material.color.set(bodyColor)
+            } 
+            else if (child.name === config.materials.wheel) {
+              child.material.color.set(wheelColor)
+            } 
+            else if (child.name === config.materials.interiorMain) {
+              child.material.color.set(interiorMainColor)
+            }
+            else if (child.name === config.materials.interiorSecondary) {
+              child.material.color.set(interiorSecondaryColor)
+            }
+            else if (config.materials.glass && child.name === config.materials.glass) {
+              child.material.color.set('#000000'); // Schwarze Glasfarbe
+            }
           }
         }
       })

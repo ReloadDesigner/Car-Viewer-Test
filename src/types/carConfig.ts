@@ -6,7 +6,12 @@ export interface CarConfig {
     drl: string;
     interiorMain: string;
     interiorSecondary: string;
+    glass?: string; // Optionales Material für Glas
   };
+  // Optionale Einstellung für Modelle, bei denen nach Material-Namen statt nach Mesh-Namen gesucht werden soll
+  useMaterialNameInsteadOfMeshName?: boolean;
+  // Optionale Einstellung für die initiale Glasfarbe
+  initialGlassColor?: string;
   // Neue Eigenschaften für modellspezifische Anpassungen
   scale?: number; // Skalierungsfaktor für das Modell
   position?: {

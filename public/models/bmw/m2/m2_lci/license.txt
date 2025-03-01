@@ -1,11 +1,11 @@
 Model Information:
-* title:	2019 BMW M2 Competition
-* source:	https://sketchfab.com/3d-models/2019-bmw-m2-competition-e43741a793da4e3f8e9747e31a1a8ff6
-* author:	Ddiaz Design (https://sketchfab.com/ddiaz-design)
+* title:	BMW M8 F92 Coupé Competition
+* source:	https://sketchfab.com/3d-models/bmw-m8-f92-coupe-competition-25d5b4f6d13e4217afa09bbf89f8d993
+* author:	kevin (ケビン) (https://sketchfab.com/sohyalebret)
 
 Model License:
-* license type:	CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
-* requirements:	Author must be credited. No commercial use. Modified versions must have the same license.
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
 
 If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
-This work is based on "2019 BMW M2 Competition" (https://sketchfab.com/3d-models/2019-bmw-m2-competition-e43741a793da4e3f8e9747e31a1a8ff6) by Ddiaz Design (https://sketchfab.com/ddiaz-design) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+This work is based on "BMW M8 F92 Coupé Competition" (https://sketchfab.com/3d-models/bmw-m8-f92-coupe-competition-25d5b4f6d13e4217afa09bbf89f8d993) by kevin (ケビン) (https://sketchfab.com/sohyalebret) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

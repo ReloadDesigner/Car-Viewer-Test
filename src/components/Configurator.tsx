@@ -130,7 +130,7 @@ function AutoRotate({
 
   useFrame((state, delta) => {
     if (isEnabled && rotationGroup.current) {
-      rotationGroup.current.rotation.y += delta * 0.5
+      rotationGroup.current.rotation.y += delta * 0.25
     }
   })
 

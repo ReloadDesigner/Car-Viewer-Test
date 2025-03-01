@@ -5,14 +5,20 @@ export const m2_lciConfig: CarConfig = {
   materials: {
     // Vorläufige Materialnamen, die später angepasst werden müssen
     // Sobald Sie die genauen Namen kennen, ersetzen Sie diese
-    body: "bBMW_M2Competition_2018Paint_Material1", // Vermuteter Name für die Karosserie
-    wheel: "Wheel", // Vermuteter Name für die Räder
-    drl: "DRL", // Vermuteter Name für die Tagfahrlichter
-    interiorMain: "InteriorMain", // Vermuteter Name für das Hauptinterieur
-    interiorSecondary: "InteriorSecondary" // Vermuteter Name für das sekundäre Interieur
+    body: "m8f92_CarPaint", // Vermuteter Name für die Karosserie
+    wheel: "m8f92_SpecularTintA", // Vermuteter Name für die Räder
+    drl: "m8f92_runninglight3", // Vermuteter Name für die Tagfahrlichter
+    interiorMain: "m8f92_InteriorColourZone", // Vermuteter Name für das Hauptinterieur
+    interiorSecondary: "m8f92_InteriorTillingColourZone", // Vermuteter Name für das sekundäre Interieur
+    glass: "m8f92_glass" // Material für das Glas
   },
+  // Spezielle Einstellung für das M2 LCI-Modell
+  // Bei diesem Modell müssen wir nach Material-Namen statt nach Mesh-Namen suchen
+  useMaterialNameInsteadOfMeshName: true,
+  // Spezielle Farbe für das Glas (schwarz)
+  initialGlassColor: "#000000",
   // Anpassungen für das M2 LCI-Modell, da es zu klein dargestellt wird
-  scale: 100.0, // Größere Skalierung für das M2 LCI-Modell
+  scale: 1.0, // Größere Skalierung für das M2 LCI-Modell
   position: {
     x: 0,
     y: 0,
