@@ -12,13 +12,13 @@ export const m8_f92Config: CarConfig = {
     interiorSecondary: "m8f92_InteriorTillingColourZone", // Vermuteter Name für das sekundäre Interieur
     glass: "m8f92_glass" // Material für das Glas
   },
-  // Spezielle Einstellung für das M2 LCI-Modell
+  // Spezielle Einstellung für das M8 Modell
   // Bei diesem Modell müssen wir nach Material-Namen statt nach Mesh-Namen suchen
   useMaterialNameInsteadOfMeshName: true,
   // Spezielle Farbe für das Glas (schwarz)
   initialGlassColor: "#000000",
-  // Anpassungen für das M2 LCI-Modell, da es zu klein dargestellt wird
-  scale: 1.0, // Größere Skalierung für das M2 LCI-Modell
+  // Anpassungen für das M8 Modell, da es zu klein dargestellt wird
+  scale: 1.0, // Größere Skalierung für das M8 Modell
   position: {
     x: 0,
     y: 0,

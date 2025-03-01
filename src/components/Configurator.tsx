@@ -16,6 +16,7 @@ import { CarConfig, ModelConfig } from '../types/carConfig'
 import { m4_f82Config } from '../config/modelConfigs/bmwConfigs/m4_f82'
 import { m8_f92Config } from '../config/modelConfigs/bmwConfigs/m8_f92';
 import { a45_amgConfig } from '../config/modelConfigs/mercedesConfigs/a-class_a45_amg';
+import { gtrR35NismoConfig } from '../config/modelConfigs/nissanConfigs/gt-r_r35_nismo';
 import Image from 'next/image'
 
 interface ConfiguratorProps {
@@ -23,12 +24,13 @@ interface ConfiguratorProps {
   initialModel: string;
 }
 
-const carBrands = ['BMW', 'Audi', 'Mercedes']
+const carBrands = ['Audi', 'BMW', 'Mercedes', 'Nissan']
 
 const carModels = {
-  BMW: ['8 Series/M8 (F9X)', '4 Series/M4 (F3X/F8X)', 'X5'],
+  BMW: ['4 Series/M4 (F3X/F8X)', '8 Series/M8 (F9X)', 'X5'],
   Audi: ['A4', 'A6', 'Q5'],
   Mercedes: ['A-Class (A45 AMG)', 'C-Class', 'E-Class', 'GLC'],
+  Nissan: ['GT-R (R35/Nismo)'],
 }
 
 const carConfigs: ModelConfig = {
@@ -42,6 +44,7 @@ const carConfigs: ModelConfig = {
   'Mercedes_C-Class': m4_f82Config, // Temporär das gleiche Modell für C-Class
   'Mercedes_E-Class': m4_f82Config, // Temporär das gleiche Modell für E-Class
   'Mercedes_GLC': m4_f82Config, // Temporär das gleiche Modell für GLC
+  'Nissan_GT-R (R35/Nismo)': gtrR35NismoConfig,
 }
 
 const drlColors = [
