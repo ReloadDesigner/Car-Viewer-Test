@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { Suspense, useState, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
@@ -13,8 +13,8 @@ import ColorPicker from './ColorPicker'
 import ConfigSection from './ConfigSection'
 import LoadButton from './LoadButton'
 import { CarConfig, ModelConfig } from '../types/carConfig'
-import { m3_f80Config } from '../config/modelConfigs/bmwConfigs/m3_f80'
-import { m2_lciConfig } from '../config/modelConfigs/bmwConfigs/m2_lci';
+import { m4_f82Config } from '../config/modelConfigs/bmwConfigs/m4_f82'
+import { m8_f92Config } from '../config/modelConfigs/bmwConfigs/m8_f92';
 import { a45_amgConfig } from '../config/modelConfigs/mercedesConfigs/a-class_a45_amg';
 import Image from 'next/image'
 
@@ -26,23 +26,22 @@ interface ConfiguratorProps {
 const carBrands = ['BMW', 'Audi', 'Mercedes']
 
 const carModels = {
-  BMW: ['M2 LCI', 'M3', 'M4', 'X5'],
+  BMW: ['8 Series/M8 (F9X)', '4 Series/M4 (F3X/F8X)', 'X5'],
   Audi: ['A4', 'A6', 'Q5'],
   Mercedes: ['A-Class (A45 AMG)', 'C-Class', 'E-Class', 'GLC'],
 }
 
 const carConfigs: ModelConfig = {
-  'BMW_M2 LCI': m2_lciConfig,
-  'BMW_M3': m3_f80Config,
-  'BMW_M4': m3_f80Config, // Temporär das gleiche Modell für M4
-  'BMW_X5': m3_f80Config, // Temporär das gleiche Modell für X5
-  'Audi_A4': m3_f80Config, // Temporär das gleiche Modell für A4
-  'Audi_A6': m3_f80Config, // Temporär das gleiche Modell für A6
-  'Audi_Q5': m3_f80Config, // Temporär das gleiche Modell für Q5
+  'BMW_8 Series/M8 (F9X)': m8_f92Config,
+  'BMW_4 Series/M4 (F3X/F8X)': m4_f82Config,
+  'BMW_X5': m4_f82Config, // Temporär das gleiche Modell für X5
+  'Audi_A4': m4_f82Config, // Temporär das gleiche Modell für A4
+  'Audi_A6': m4_f82Config, // Temporär das gleiche Modell für A6
+  'Audi_Q5': m4_f82Config, // Temporär das gleiche Modell für Q5
   'Mercedes_A-Class (A45 AMG)': a45_amgConfig,
-  'Mercedes_C-Class': m3_f80Config, // Temporär das gleiche Modell für C-Class
-  'Mercedes_E-Class': m3_f80Config, // Temporär das gleiche Modell für E-Class
-  'Mercedes_GLC': m3_f80Config, // Temporär das gleiche Modell für GLC
+  'Mercedes_C-Class': m4_f82Config, // Temporär das gleiche Modell für C-Class
+  'Mercedes_E-Class': m4_f82Config, // Temporär das gleiche Modell für E-Class
+  'Mercedes_GLC': m4_f82Config, // Temporär das gleiche Modell für GLC
 }
 
 const drlColors = [
@@ -201,7 +200,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
 
   useEffect(() => {
     const configKey = `${selectedBrand}_${selectedModel}` as keyof typeof carConfigs
-    setCarConfig(carConfigs[configKey] || carConfigs['BMW_M3'])
+    setCarConfig(carConfigs[configKey] || carConfigs['BMW_8 Series/M8 (F9X)'])
   }, [selectedBrand, selectedModel])
 
   useEffect(() => {
@@ -267,7 +266,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
     const configKey = `${tempBrand}_${tempModel}` as keyof typeof carConfigs
     setSelectedBrand(tempBrand)
     setSelectedModel(tempModel)
-    setCarConfig(carConfigs[configKey] || carConfigs['BMW_M3'])
+    setCarConfig(carConfigs[configKey] || carConfigs['BMW_8 Series/M8 (F9X)'])
     
     // Set initial position for slide-in (off to the left)
     setInitialPosition(-10)

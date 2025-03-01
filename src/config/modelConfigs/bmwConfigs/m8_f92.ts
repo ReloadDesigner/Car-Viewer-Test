@@ -1,7 +1,7 @@
 import { CarConfig } from '../../../types/carConfig';
 
-export const m2_lciConfig: CarConfig = {
-  modelFile: '/models/bmw/m2/m2_lci/m2_lci.gltf',
+export const m8_f92Config: CarConfig = {
+  modelFile: '/models/bmw/8series/m8/m8_f92/m8_f92.gltf',
   materials: {
     // Vorläufige Materialnamen, die später angepasst werden müssen
     // Sobald Sie die genauen Namen kennen, ersetzen Sie diese
