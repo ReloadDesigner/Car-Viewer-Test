@@ -8,7 +8,7 @@ export const m8_f92Config: CarConfig = {
     body: "m8f92_CarPaint", // Vermuteter Name für die Karosserie
     wheel: "m8f92_SpecularTintA", // Vermuteter Name für die Räder
     drl: "m8f92_runninglight3", // Vermuteter Name für die Tagfahrlichter
-    interiorMain: "m8f92_InteriorColourZone", // Vermuteter Name für das Hauptinterieur
+    interiorMain: ["m8f92_InteriorColourZone", "m8f92_InteriorColor2"], // Beide Interior-Materialien, die gefärbt werden sollen
     interiorSecondary: "m8f92_InteriorTillingColourZone", // Vermuteter Name für das sekundäre Interieur
     glass: "m8f92_glass" // Material für das Glas
   },

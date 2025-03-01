@@ -4,7 +4,7 @@ export interface CarConfig {
     body: string;
     wheel: string;
     drl: string;
-    interiorMain: string;
+    interiorMain: string | string[]; // Kann ein einzelner Materialname oder eine Liste von Materialnamen sein
     interiorSecondary: string;
     glass?: string; // Optionales Material für Glas
   };

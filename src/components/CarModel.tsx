@@ -118,7 +118,11 @@ export default function CarModel({
           else if (child.material.name === config.materials.wheel) {
             originalColors.wheel = '#' + child.material.color.getHexString()
           } 
-          else if (child.material.name === config.materials.interiorMain) {
+          else if (Array.isArray(config.materials.interiorMain)) {
+            if (config.materials.interiorMain.includes(child.material.name)) {
+              originalColors.interiorMain = '#' + child.material.color.getHexString()
+            }
+          } else if (child.material.name === config.materials.interiorMain) {
             originalColors.interiorMain = '#' + child.material.color.getHexString()
           }
           else if (child.material.name === config.materials.interiorSecondary) {
@@ -214,6 +218,30 @@ export default function CarModel({
             });
             child.material = drlMaterial;
           }
+          // Spezielle Behandlung für die Sitze (Object_42) - Material-Klonen für isolierte Farbänderung
+          else if (child.name === "Object_42") {
+            // Wir erstellen für die Sitze ein eigenes Material, das vom Original isoliert ist
+            if (child.material) {
+              if (Array.isArray(child.material)) {
+                // Bei einem Array von Materialien klonen wir jedes Material
+                child.material = child.material.map(mat => {
+                  const clonedMat = mat.clone();
+                  clonedMat.name = mat.name + "_seat_clone";
+                  clonedMat.color.set(interiorMainColor);
+                  console.log(`Geklontes Sitzmaterial erstellt und gefärbt: ${clonedMat.name}`);
+                  return clonedMat;
+                });
+              } else {
+                // Bei einem einzelnen Material klonen wir es
+                const originalMat = child.material;
+                const clonedMat = originalMat.clone();
+                clonedMat.name = originalMat.name + "_seat_clone";
+                clonedMat.color.set(interiorMainColor);
+                child.material = clonedMat;
+                console.log(`Geklontes Sitzmaterial erstellt und gefärbt: ${clonedMat.name} für Mesh ${child.name}`);
+              }
+            }
+          }
           // Direkter Zugriff auf Felgen durch Mesh-Namen - höhere Priorität als andere Methoden
           else if (isWheelByMeshName) {
             if (child.material) {
@@ -249,22 +277,39 @@ export default function CarModel({
           }
           // Andere Material-Zuweisungen
           else if (config.useMaterialNameInsteadOfMeshName && child.material && !Array.isArray(child.material)) {
-            // Suche nach Material-Namen (speziell für m2_lci)
-            if (child.material.name === config.materials.body) {
-              child.material.color.set(bodyColor)
+            const materialName = child.material.name;
+            
+            // Prüfen, ob das Material das Body-Material ist
+            if (materialName === config.materials.body) {
+              child.material.color.set(bodyColor);
+              console.log(`Karosseriefarbe gesetzt für Material: ${materialName}`);
             } 
-            else if (isWheelByMaterialName) {
-              child.material.color.set(wheelColor)
-              console.log(`Felgenfarbe gesetzt für Material: ${child.material.name} an Mesh: ${child.name}`);
+            // Prüfen, ob das Material das Wheel-Material ist
+            else if (materialName === config.materials.wheel) {
+              child.material.color.set(wheelColor);
+              console.log(`Felgenfarbe gesetzt für Material: ${materialName}`);
             } 
-            else if (child.material.name === config.materials.interiorMain) {
-              child.material.color.set(interiorMainColor)
+            // Prüfen, ob das Material in der interiorMain-Liste ist (falls interiorMain ein Array ist)
+            else if (Array.isArray(config.materials.interiorMain) && config.materials.interiorMain.includes(materialName)) {
+              child.material.color.set(interiorMainColor);
+              console.log(`Interior-Hauptfarbe gesetzt für Material: ${materialName}`);
             }
-            else if (child.material.name === config.materials.interiorSecondary) {
-              child.material.color.set(interiorSecondaryColor)
+            // Prüfen, ob das Material das interiorMain-Material ist (falls interiorMain ein String ist)
+            else if (!Array.isArray(config.materials.interiorMain) && materialName === config.materials.interiorMain) {
+              child.material.color.set(interiorMainColor);
+              console.log(`Interior-Hauptfarbe gesetzt für Material: ${materialName}`);
             }
-            else if (config.materials.glass && child.material.name === config.materials.glass) {
-              child.material.color.set('#000000'); // Schwarze Glasfarbe
+            // Prüfen, ob das Material das interiorSecondary-Material ist
+            else if (materialName === config.materials.interiorSecondary) {
+              child.material.color.set(interiorSecondaryColor);
+              console.log(`Interior-Sekundärfarbe gesetzt für Material: ${materialName}`);
+            }
+            // Prüfen, ob das Material das Glass-Material ist
+            else if (config.materials.glass && materialName === config.materials.glass) {
+              // Verwende initialGlassColor falls vorhanden, sonst Schwarz
+              const glassColor = config.initialGlassColor || '#000000';
+              child.material.color.set(glassColor);
+              console.log(`Glasfarbe gesetzt auf ${glassColor} für Material: ${materialName}`);
             }
           } else {
             // Standard-Logik: Suche nach Mesh-Namen (außer für DRL, die werden oben behandelt)
@@ -272,14 +317,18 @@ export default function CarModel({
               child.material.color.set(bodyColor)
             } 
             // Wheel wird oben mit höherer Priorität behandelt
-            else if (child.name === config.materials.interiorMain) {
+            else if (Array.isArray(config.materials.interiorMain) && config.materials.interiorMain.includes(child.name)) {
+              child.material.color.set(interiorMainColor)
+            }
+            else if (!Array.isArray(config.materials.interiorMain) && child.name === config.materials.interiorMain) {
               child.material.color.set(interiorMainColor)
             }
             else if (child.name === config.materials.interiorSecondary) {
               child.material.color.set(interiorSecondaryColor)
             }
             else if (config.materials.glass && child.name === config.materials.glass) {
-              child.material.color.set('#000000'); // Schwarze Glasfarbe
+              const glassColor = config.initialGlassColor || '#000000';
+              child.material.color.set(glassColor);
             }
           }
         }
