@@ -181,6 +181,57 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
   const [modelTransitioning, setModelTransitioning] = useState(false) // Track when model is transitioning
   const [slideDirection, setSlideDirection] = useState<'none' | 'out' | 'in'>('none') // Track slide animation phase
   const [initialPosition, setInitialPosition] = useState<number | null>(null) // Track initial position for slide-in
+  const [showResetColorsDialog, setShowResetColorsDialog] = useState(false)
+
+  const hasColorChanges = () => {
+    return (
+      bodyColor !== originalColors.body ||
+      wheelColor !== originalColors.wheel ||
+      drlColor !== '#FFFFFF' ||
+      interiorMainColor !== originalColors.interiorMain ||
+      interiorSecondaryColor !== originalColors.interiorSecondary
+    );
+  };
+
+  const initiateModelChange = () => {
+    // Zuerst das Fahrzeugauswahlmenü schließen
+    setShowVehicleSelector(false);
+    
+    // Danach prüfen ob Farbänderungen vorhanden sind
+    if (hasColorChanges()) {
+      setShowResetColorsDialog(true);
+    } else {
+      handleLoadModel();
+    }
+  };
+
+  const handleLoadModel = async () => {
+    setShowResetColorsDialog(false);
+    
+    setSlideDirection('out')
+    setModelTransitioning(true)
+    setIsModelLoading(true)
+    
+    await new Promise(resolve => setTimeout(resolve, 700))
+    
+    const configKey = `${tempBrand}_${tempModel}` as keyof typeof carConfigs
+    setSelectedBrand(tempBrand)
+    setSelectedModel(tempModel)
+    setCarConfig(carConfigs[configKey] || carConfigs['BMW_8 Series/M8 (F9X)'])
+    
+    setInitialPosition(-10)
+    
+    await new Promise(resolve => setTimeout(resolve, 200))
+    
+    setSlideDirection('in')
+    
+    setTimeout(() => {
+      setSlideDirection('none')
+      setInitialPosition(null)
+      setModelTransitioning(false)
+      setIsModelLoading(false)
+    }, 800)
+  }
 
   useEffect(() => {
     const checkMobile = () => {
@@ -229,22 +280,17 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
   const captureScreenshot = async () => {
     const canvas = document.querySelector('canvas');
     if (canvas) {
-      // Warte einen Frame, um sicherzustellen, dass der aktuelle Render abgeschlossen ist
       await new Promise(resolve => requestAnimationFrame(resolve));
       
-      // Erstelle ein temporäres Canvas in der gleichen Größe
       const tempCanvas = document.createElement('canvas');
       const ctx = tempCanvas.getContext('2d');
       
-      // Setze die gleiche Größe wie das Original-Canvas
       tempCanvas.width = canvas.width;
       tempCanvas.height = canvas.height;
       
-      // Zeichne das Original-Canvas auf das temporäre Canvas
       if (ctx) {
         ctx.drawImage(canvas, 0, 0);
         
-        // Erstelle den Download mit dem temporären Canvas
         const link = document.createElement('a');
         link.download = `${selectedBrand}_${selectedModel}_config.png`;
         link.href = tempCanvas.toDataURL('image/png', 1.0);
@@ -254,40 +300,6 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
       }
     }
   };
-
-  const handleLoadModel = async () => {
-    // Start slide-out animation
-    setSlideDirection('out')
-    setModelTransitioning(true)
-    setIsModelLoading(true)
-    setShowVehicleSelector(false)
-    
-    // Wait for slide-out to complete
-    await new Promise(resolve => setTimeout(resolve, 700))
-    
-    // Update model configuration while out of view
-    const configKey = `${tempBrand}_${tempModel}` as keyof typeof carConfigs
-    setSelectedBrand(tempBrand)
-    setSelectedModel(tempModel)
-    setCarConfig(carConfigs[configKey] || carConfigs['BMW_8 Series/M8 (F9X)'])
-    
-    // Set initial position for slide-in (off to the left)
-    setInitialPosition(-10)
-    
-    // Small delay to process model and for user to notice the change
-    await new Promise(resolve => setTimeout(resolve, 200))
-    
-    // Start slide-in animation
-    setSlideDirection('in')
-    
-    // Complete the transition after slide-in completes
-    setTimeout(() => {
-      setSlideDirection('none')
-      setInitialPosition(null)
-      setModelTransitioning(false)
-      setIsModelLoading(false)
-    }, 800)
-  }
 
   return (
     <div className="w-full h-screen flex flex-col bg-gray-900 overflow-hidden">
@@ -313,6 +325,55 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
           </button>
         </div>
       </nav>
+
+      {/* Color Reset Dialog */}
+      <AnimatePresence>
+        {showResetColorsDialog && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
+              className="bg-black/90 rounded-2xl border border-white/10 p-6 w-full max-w-md"
+            >
+              <div className="space-y-6">
+                <h2 className="text-white text-xl font-bold">Reset Color Changes</h2>
+                
+                <p className="text-white/80">
+                  You have made color changes to the current vehicle. 
+                  Would you like to reset these changes before loading the new vehicle?
+                </p>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => {
+                      resetColors();
+                      handleLoadModel();
+                    }}
+                    className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-br from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 text-white transition-all duration-200 shadow-lg"
+                    disabled={isModelLoading}
+                  >
+                    Reset & Change
+                  </button>
+                  <button
+                    onClick={() => setShowResetColorsDialog(false)}
+                    className="flex-1 px-4 py-2 rounded-lg bg-black/40 hover:bg-black/60 text-white border border-white/10 transition-all duration-200"
+                    disabled={isModelLoading}
+                  >
+                    Resume
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Vehicle Selector Modal */}
       <AnimatePresence>
@@ -379,7 +440,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                     Cancel
                   </button>
                   <LoadButton
-                    onClick={handleLoadModel}
+                    onClick={initiateModelChange}
                     isLoading={isModelLoading}
                     className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-br from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 text-white transition-all duration-200 shadow-lg"
                   >

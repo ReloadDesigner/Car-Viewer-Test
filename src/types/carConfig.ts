@@ -22,8 +22,6 @@ export interface CarConfig {
   useMaterialNameInsteadOfMeshName?: boolean;
   // Optionale Einstellung für die initiale Glasfarbe
   initialGlassColor?: string;
-  // Optional für Debug-Zwecke
-  debug?: boolean;
   // Neue Eigenschaften für modellspezifische Anpassungen
   scale?: number; // Skalierungsfaktor für das Modell
   position?: {
