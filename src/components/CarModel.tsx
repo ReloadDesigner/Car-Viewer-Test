@@ -173,11 +173,15 @@ export default function CarModel({
           // Bedingungsvariablen für klarere Logik
           const isDrlMesh = config.drlConfig && config.drlConfig.meshFilter.includes(child.name);
           const isStandardDrl = !config.drlConfig && child.name.includes(config.materials.drl);
-          const isWheelByMeshName = child.name === config.materials.wheel;
-          const isWheelByMaterialName = config.useMaterialNameInsteadOfMeshName && 
-                                       child.material && 
-                                       !Array.isArray(child.material) && 
-                                       child.material.name === config.materials.wheel;
+          
+          // Erweiterte Bedingung für Felgen, um auch wheelConfig zu berücksichtigen
+          const isWheelByMeshName = config.materials.wheel && 
+                                     (child.name === config.materials.wheel || 
+                                     (config.wheelConfig && 
+                                      (child.name.includes(config.wheelConfig.materialName) || 
+                                       child.name === config.wheelConfig.materialName)) ||
+                                     child.name.includes(config.materials.wheel));
+                                     
           const isGlassByMeshName = config.materials.glass && child.name === config.materials.glass;
           
           // Debug-Ausgabe für Räder
@@ -245,18 +249,62 @@ export default function CarModel({
           // Direkter Zugriff auf Felgen durch Mesh-Namen - höhere Priorität als andere Methoden
           else if (isWheelByMeshName) {
             if (child.material) {
-              if (Array.isArray(child.material)) {
-                child.material.forEach(mat => {
-                  mat.color.set(wheelColor);
-                });
-                console.log(`Felgenfarbe gesetzt (Array von Materialien) für Mesh: ${child.name}`);
-              } else {
-                child.material.color.set(wheelColor);
-                console.log(`Felgenfarbe gesetzt für Mesh: ${child.name}, Material: ${child.material.name}`);
+              // Spezielle Behandlung für Felgen mit wheelConfig
+              if (config.wheelConfig && (child.name.includes(config.wheelConfig.materialName) || child.name === config.wheelConfig.materialName)) {
+                console.log(`Spezielle Felge gefunden (wheelConfig): ${child.name}`);
+                
+                // Wenn requiresCloning aktiviert ist, erstellen wir Klone der Materialien
+                if (config.wheelConfig.requiresCloning) {
+                  // Bei einem Array von Materialien
+                  if (Array.isArray(child.material)) {
+                    // Für jeden Mesh der Felge erstellen wir Klone aller Materialien
+                    child.material = child.material.map(mat => {
+                      // Erstelle ein neues Material, das vom Original isoliert ist
+                      const clonedMat = mat.clone();
+                      clonedMat.name = `${mat.name}_wheel_clone`;
+                      clonedMat.color.set(wheelColor);
+                      return clonedMat;
+                    });
+                    console.log(`Felgenfarbe gesetzt (Array von Materialien, geklont) für Felge: ${child.name}`);
+                  } 
+                  // Bei einem einzelnen Material
+                  else {
+                    // Erstelle ein neues Material, das vom Original isoliert ist
+                    const clonedMat = child.material.clone();
+                    clonedMat.name = `${child.material.name}_wheel_clone`;
+                    clonedMat.color.set(wheelColor);
+                    child.material = clonedMat;
+                    console.log(`Felgenfarbe gesetzt (geklont) für Felge: ${child.name}, Material: ${clonedMat.name}`);
+                  }
+                }
+                // Wenn kein Klonen erforderlich ist, setzen wir die Farbe direkt
+                else {
+                  if (Array.isArray(child.material)) {
+                    child.material.forEach(mat => {
+                      mat.color.set(wheelColor);
+                    });
+                    console.log(`Felgenfarbe gesetzt (Array von Materialien) für spezielle Felge: ${child.name}`);
+                  } else {
+                    child.material.color.set(wheelColor);
+                    console.log(`Felgenfarbe gesetzt für spezielle Felge: ${child.name}, Material: ${child.material.name}`);
+                  }
+                }
+              }
+              // Standard-Behandlung für andere Felgen
+              else {
+                if (Array.isArray(child.material)) {
+                  child.material.forEach(mat => {
+                    mat.color.set(wheelColor);
+                  });
+                  console.log(`Felgenfarbe gesetzt (Array von Materialien) für Mesh: ${child.name}`);
+                } else {
+                  child.material.color.set(wheelColor);
+                  console.log(`Felgenfarbe gesetzt für Mesh: ${child.name}, Material: ${child.material.name}`);
+                }
               }
             }
           }
-          // Direkter Zugriff auf Glas durch Mesh-Namen - höhere Priorität als andere Methoden
+          // Direkter Zugriff auf Glas durch Mesh-Namen
           else if (isGlassByMeshName) {
             if (child.material) {
               const glassColor = config.initialGlassColor || '#000000'; // Schwarz als Standardfarbe für Glas

@@ -13,10 +13,17 @@ export interface CarConfig {
     meshFilter: string[]; // Welche Mesh-Namen für DRL verwendet werden sollen
     materialName: string; // Welches Material für diese Meshes geändert werden soll
   };
+  // Optionale spezielle Konfiguration für Felgen mit komplexen Materialien
+  wheelConfig?: {
+    materialName: string; // Welches Material für die Felgen verwendet wird
+    requiresCloning?: boolean; // Gibt an, ob Materialien geklont werden müssen für isolierte Farbänderungen
+  };
   // Optionale Einstellung für Modelle, bei denen nach Material-Namen statt nach Mesh-Namen gesucht werden soll
   useMaterialNameInsteadOfMeshName?: boolean;
   // Optionale Einstellung für die initiale Glasfarbe
   initialGlassColor?: string;
+  // Optional für Debug-Zwecke
+  debug?: boolean;
   // Neue Eigenschaften für modellspezifische Anpassungen
   scale?: number; // Skalierungsfaktor für das Modell
   position?: {
