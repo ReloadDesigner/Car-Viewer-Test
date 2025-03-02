@@ -347,12 +347,12 @@ export default function CarModel({
               child.material.color.set(interiorMainColor);
             }
             else if (materialName === config.materials.interiorSecondary || 
-                     (config.modelFile.includes('a45_amg') && materialName === 'Meshesperforation1Mtl')) {
+                     (config.modelFile.includes('c63_amg') && materialName === 'Meshesperforation1Mtl')) {
               child.material.color.set(interiorSecondaryColor);
             }
             else if ((Array.isArray(config.materials.interiorMain) && config.materials.interiorMain.includes(materialName)) ||
                      (!Array.isArray(config.materials.interiorMain) && materialName === config.materials.interiorMain) || 
-                     (config.modelFile.includes('a45_amg') && 
+                     (config.modelFile.includes('c63_amg') && 
                       (materialName === 'Meshesleather0081Mtl' || 
                        materialName === 'Meshesleather0071Mtl' || 
                        materialName === 'Meshesleather0011Mtl' || 
@@ -387,11 +387,11 @@ export default function CarModel({
               child.material.color.set(interiorMainColor)
             }
             else if (child.name === config.materials.interiorSecondary ||
-                     (config.modelFile.includes('a45_amg') && child.name === 'Object_58')) {
+                     (config.modelFile.includes('c63_amg') && child.name === 'Object_58')) {
               child.material.color.set(interiorSecondaryColor)
             }
             else if (child.name === config.materials.interiorMain ||
-                     (config.modelFile.includes('a45_amg') && 
+                     (config.modelFile.includes('c63_amg') && 
                       (child.name === 'Object_51' || 
                        child.name === 'Object_50' || 
                        child.name === 'Object_44' || 

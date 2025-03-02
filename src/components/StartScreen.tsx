@@ -14,9 +14,9 @@ interface StartScreenProps {
 const carBrands = ['Audi', 'BMW', 'Mercedes', 'Nissan']
 
 const carModels = {
-  BMW: ['4 Series/M4 (F3X/F8X)', '8 Series/M8 (F9X)', 'X5'],
+  BMW: ['4 Series/M4 (F3X/F8X)', '8 Series/M8 (F9X)'],
   Audi: ['A4', 'A6', 'Q5'],
-  Mercedes: ['A-Class (A45 AMG)', 'C-Class', 'E-Class', 'GLC'],
+  Mercedes: ['C-Class (W205) AMG/Coupé'],
   Nissan: ['GT-R (R35/Nismo)']
 }
 

@@ -16,7 +16,7 @@ import LoadButton from './LoadButton'
 import { CarConfig, ModelConfig } from '../types/carConfig'
 import { m4_f82Config } from '../config/modelConfigs/bmwConfigs/m4_f82'
 import { m8_f92Config } from '../config/modelConfigs/bmwConfigs/m8_f92';
-import { a45_amgConfig } from '../config/modelConfigs/mercedesConfigs/a-class_a45_amg';
+import { c63_amgConfig } from '../config/modelConfigs/mercedesConfigs/c-class_c63_amg';
 import { gtrR35NismoConfig } from '../config/modelConfigs/nissanConfigs/gt-r_r35_nismo';
 import Image from 'next/image'
 
@@ -28,23 +28,19 @@ interface ConfiguratorProps {
 const carBrands = ['Audi', 'BMW', 'Mercedes', 'Nissan']
 
 const carModels = {
-  BMW: ['4 Series/M4 (F3X/F8X)', '8 Series/M8 (F9X)', 'X5'],
+  BMW: ['4 Series/M4 (F3X/F8X)', '8 Series/M8 (F9X)'],
   Audi: ['A4', 'A6', 'Q5'],
-  Mercedes: ['A-Class (A45 AMG)','C-Class', 'E-Class', 'GLC'],
+  Mercedes: ['C-Class (W205) AMG/Coupé'],
   Nissan: ['GT-R (R35/Nismo)'],
 }
 
 const carConfigs: ModelConfig = {
   'BMW_8 Series/M8 (F9X)': m8_f92Config,
   'BMW_4 Series/M4 (F3X/F8X)': m4_f82Config,
-  'BMW_X5': m4_f82Config, // Temporär das gleiche Modell für X5
   'Audi_A4': m4_f82Config, // Temporär das gleiche Modell für A4
   'Audi_A6': m4_f82Config, // Temporär das gleiche Modell für A6
   'Audi_Q5': m4_f82Config, // Temporär das gleiche Modell für Q5
-  'Mercedes_A-Class (A45 AMG)': a45_amgConfig,
-  'Mercedes_C-Class': m4_f82Config, // Temporär das gleiche Modell für C-Class
-  'Mercedes_E-Class': m4_f82Config, // Temporär das gleiche Modell für E-Class
-  'Mercedes_GLC': m4_f82Config, // Temporär das gleiche Modell für GLC
+  'Mercedes_C-Class (W205) AMG/Coupé': c63_amgConfig,
   'Nissan_GT-R (R35/Nismo)': gtrR35NismoConfig,
 }
 
