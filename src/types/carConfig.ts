@@ -16,7 +16,9 @@ export interface CarConfig {
   // Optionale spezielle Konfiguration für Felgen mit komplexen Materialien
   wheelConfig?: {
     materialName: string; // Welches Material für die Felgen verwendet wird
+    meshName?: string | string[]; // Welcher Mesh-Name oder welche Mesh-Namen für die Felgen verwendet werden
     requiresCloning?: boolean; // Gibt an, ob Materialien geklont werden müssen für isolierte Farbänderungen
+    additionalMaterials?: string[]; // Zusätzliche Material-Namen, die ebenfalls als Rad-Materialien behandelt werden sollen
   };
   // Optionale Einstellung für Modelle, bei denen nach Material-Namen statt nach Mesh-Namen gesucht werden soll
   useMaterialNameInsteadOfMeshName?: boolean;

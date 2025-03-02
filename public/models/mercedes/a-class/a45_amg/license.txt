@@ -1,6 +1,6 @@
 Model Information:
-* title:	Mercedes-AMG C 63 Sedan S
-* source:	https://sketchfab.com/3d-models/mercedes-amg-c-63-sedan-s-b01067cab47d4a3c90738a96b3818550
+* title:	Mercedes-AMG C 63 Coupe S (W205)
+* source:	https://sketchfab.com/3d-models/mercedes-amg-c-63-coupe-s-w205-c8f54d07a4ca451ebc4a15f27a4230c3
 * author:	GT Cars: Hyperspeed (https://sketchfab.com/Car2022)
 
 Model License:
@@ -8,4 +8,4 @@ Model License:
 * requirements:	Author must be credited. Commercial use is allowed.
 
 If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
-This work is based on "Mercedes-AMG C 63 Sedan S" (https://sketchfab.com/3d-models/mercedes-amg-c-63-sedan-s-b01067cab47d4a3c90738a96b3818550) by GT Cars: Hyperspeed (https://sketchfab.com/Car2022) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+This work is based on "Mercedes-AMG C 63 Coupe S (W205)" (https://sketchfab.com/3d-models/mercedes-amg-c-63-coupe-s-w205-c8f54d07a4ca451ebc4a15f27a4230c3) by GT Cars: Hyperspeed (https://sketchfab.com/Car2022) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
