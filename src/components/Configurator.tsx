@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { Suspense, useState, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
@@ -555,7 +555,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
             onClick={() => setShowLicenseInfo(false)}
           >
             <motion.div 
-              className="bg-slate-900 p-6 rounded-lg max-w-xl w-full border border-white/10 shadow-xl max-h-[80vh] overflow-y-auto"
+              className="bg-slate-900 p-6 rounded-lg max-w-xl w-full border border-white/10 shadow-xl max-h-[80vh] flex flex-col"
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
@@ -573,11 +573,13 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                 </button>
               </div>
               
-              <div className="text-gray-300 text-sm space-y-4">
+              <div className="text-gray-300 text-sm">
                 <p className="border-b border-white/10 pb-2">
                   The 3D models in this configurator are subject to the following license terms:
                 </p>
+              </div>
                 
+              <div className="text-gray-300 text-sm space-y-4 my-4 flex-1 overflow-y-auto pr-2">
                 <div>
                   <h3 className="font-semibold mb-1">BMW M4 F82</h3>
                   <p className="text-xs text-gray-400">
@@ -593,13 +595,22 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                 </div>
                 
                 <div>
+                  <h3 className="font-semibold mb-1">Mercedes-AMG C 63 Coupe S (W205)</h3>
+                  <p className="text-xs text-gray-400">
+                    This work is based on "Mercedes-AMG C 63 Coupe S (W205)" (https://sketchfab.com/3d-models/mercedes-amg-c-63-coupe-s-w205-c8f54d07a4ca451ebc4a15f27a4230c3) by GT Cars: Hyperspeed (https://sketchfab.com/Car2022) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+                  </p>
+                </div>
+                
+                <div>
                   <h3 className="font-semibold mb-1">Nissan GT-R R35 Nismo</h3>
                   <p className="text-xs text-gray-400">
                     This work is based on "Nissan GT-R R35 Nismo | www.vecarz.com" (https://sketchfab.com/3d-models/nissan-gt-r-r35-nismo-wwwvecarzcom-9cfbe4727b7f4af0a11772687c4a1f59) by vecarz (https://sketchfab.com/heynic) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
                   </p>
                 </div>
-                
-                <p className="pt-2 text-xs italic">
+              </div>
+              
+              <div className="text-gray-300 text-sm mt-2 pt-2 border-t border-white/10">
+                <p className="text-xs italic">
                   All vehicle brands, logos, and model designations are the property of their respective manufacturers and are used here
                   for informational purposes only. This application is not affiliated with or endorsed by the vehicle manufacturers.
                 </p>
