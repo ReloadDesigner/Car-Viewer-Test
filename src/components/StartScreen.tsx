@@ -11,13 +11,13 @@ interface StartScreenProps {
   onStartConfiguration: (brand: string, model: string) => void
 }
 
-const carBrands = ['Audi', 'BMW', 'Mercedes', 'Nissan']
+const carBrands = ['BMW', 'Mercedes', 'Nissan', 'Toyota']
 
 const carModels = {
   BMW: ['4 Series/M4 (F3X/F8X)', '8 Series/M8 (F9X)'],
-  Audi: ['A4', 'A6', 'Q5'],
   Mercedes: ['C-Class (W205) AMG/Coupé'],
-  Nissan: ['GT-R (R35/Nismo)']
+  Nissan: ['GT-R (R35/Nismo)'],
+  Toyota: ['GR Supra']
 }
 
 export default function StartScreen({ onStartConfiguration }: StartScreenProps) {

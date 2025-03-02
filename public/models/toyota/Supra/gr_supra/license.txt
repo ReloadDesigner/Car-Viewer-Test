@@ -1,0 +1,11 @@
+Model Information:
+* title:	Toyota Supra 3D Model (Free)
+* source:	https://sketchfab.com/3d-models/toyota-supra-3d-model-free-41b83cfb912b4eab9af19a802bcf5ffc
+* author:	Mpgs Studios (https://sketchfab.com/mpgs.studio)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Toyota Supra 3D Model (Free)" (https://sketchfab.com/3d-models/toyota-supra-3d-model-free-41b83cfb912b4eab9af19a802bcf5ffc) by Mpgs Studios (https://sketchfab.com/mpgs.studio) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

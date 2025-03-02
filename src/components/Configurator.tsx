@@ -18,6 +18,7 @@ import { m4_f82Config } from '../config/modelConfigs/bmwConfigs/m4_f82'
 import { m8_f92Config } from '../config/modelConfigs/bmwConfigs/m8_f92';
 import { c63_amgConfig } from '../config/modelConfigs/mercedesConfigs/c-class_c63_amg';
 import { gtrR35NismoConfig } from '../config/modelConfigs/nissanConfigs/gt-r_r35_nismo';
+import { grSupraConfig } from '../config/modelConfigs/toyotaConfigs/gr_supra';
 import Image from 'next/image'
 
 interface ConfiguratorProps {
@@ -25,23 +26,21 @@ interface ConfiguratorProps {
   initialModel: string;
 }
 
-const carBrands = ['Audi', 'BMW', 'Mercedes', 'Nissan']
+const carBrands = ['BMW', 'Mercedes', 'Nissan', 'Toyota']
 
 const carModels = {
   BMW: ['4 Series/M4 (F3X/F8X)', '8 Series/M8 (F9X)'],
-  Audi: ['A4', 'A6', 'Q5'],
   Mercedes: ['C-Class (W205) AMG/Coupé'],
   Nissan: ['GT-R (R35/Nismo)'],
+  Toyota: ['GR Supra']
 }
 
 const carConfigs: ModelConfig = {
   'BMW_8 Series/M8 (F9X)': m8_f92Config,
   'BMW_4 Series/M4 (F3X/F8X)': m4_f82Config,
-  'Audi_A4': m4_f82Config, // Temporär das gleiche Modell für A4
-  'Audi_A6': m4_f82Config, // Temporär das gleiche Modell für A6
-  'Audi_Q5': m4_f82Config, // Temporär das gleiche Modell für Q5
   'Mercedes_C-Class (W205) AMG/Coupé': c63_amgConfig,
   'Nissan_GT-R (R35/Nismo)': gtrR35NismoConfig,
+  'Toyota_GR Supra': grSupraConfig
 }
 
 const drlColors = [
@@ -601,6 +600,13 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                   <h3 className="font-semibold mb-1">Nissan GT-R R35 Nismo</h3>
                   <p className="text-xs text-gray-400">
                     This work is based on "Nissan GT-R R35 Nismo | www.vecarz.com" (https://sketchfab.com/3d-models/nissan-gt-r-r35-nismo-wwwvecarzcom-9cfbe4727b7f4af0a11772687c4a1f59) by vecarz (https://sketchfab.com/heynic) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold mb-1">Toyota GR Supra</h3>
+                  <p className="text-xs text-gray-400">
+                    This work is based on "Toyota GR Supra" (https://sketchfab.com/3d-models/toyota-gr-supra-4e5b4f6d13e4217afa09bbf89f8d993) by Toyota (https://sketchfab.com/Toyota) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
                   </p>
                 </div>
                 
