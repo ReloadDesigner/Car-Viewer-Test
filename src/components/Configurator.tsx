@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { Suspense, useState, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
@@ -331,7 +331,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
     // Kurze Verzögerung, damit der Disclaimer nach vollständigem Laden erscheint
     const timer = setTimeout(() => {
       setShowDisclaimerDialog(true)
-    }, 1000)
+    }, 1500)
     return () => clearTimeout(timer)
   }, []) // Leeres Dependency-Array bedeutet: nur beim ersten Laden der Komponente ausführen
 

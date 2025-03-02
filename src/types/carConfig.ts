@@ -10,8 +10,13 @@ export interface CarConfig {
   };
   // Optionale spezielle Konfiguration für DRL-Lichter mit komplexen Materialien
   drlConfig?: {
-    meshFilter: string[]; // Welche Mesh-Namen für DRL verwendet werden sollen
-    materialName: string; // Welches Material für diese Meshes geändert werden soll
+    meshFilter?: string | string[]; // Welche Mesh-Namen für DRL verwendet werden sollen
+    materialName?: string; // Welches Material für diese Meshes geändert werden soll
+    // Neue Optionen für spezielles DRL-Rendering
+    renderOptions?: {
+      customRenderOrder?: boolean;  // Ob eine benutzerdefinierte Rendering-Reihenfolge verwendet werden soll
+      renderingPriority?: number;   // Priorität für die Rendering-Reihenfolge (höher = wichtiger)
+    };
   };
   // Optionale spezielle Konfiguration für Felgen mit komplexen Materialien
   wheelConfig?: {

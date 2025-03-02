@@ -10,7 +10,7 @@ export const c63_amgConfig: CarConfig = {
     drl: "Object_83", // DRL-Objekt
     interiorMain: ["Meshesleather0081Mtl", "Meshesleather0071Mtl", "Meshesleather0011Mtl", "Meshesleather0031Mtl"], // Hauptinnenraummaterialien
     interiorSecondary: "Meshesperforation1Mtl", // Sekundäres Innenraummaterial
-    glass: "material_37" // Glasmaterial
+    glass: "material_37" // Glas-Material
   },
   // Speziell für Sitze und Innenraum des C63 AMG
   interiorConfig: {
@@ -32,19 +32,25 @@ export const c63_amgConfig: CarConfig = {
   // Spezifisches DRL-Setup für den C63 AMG
   drlConfig: {
     meshFilter: ["Object_83", "Object_80"], // Beide Objekte für DRL
-    materialName: "material_7" // DRL-Material
+    materialName: "material_7", // DRL-Material
+    // Zusätzliche Optionen für DRL-Rendering
+    renderOptions: {
+      customRenderOrder: true, // Aktiviert spezielle Rendering-Reihenfolge
+      renderingPriority: 2     // Höhere Priorität für die DRLs
+    }
   },
-  useMaterialNameInsteadOfMeshName: true, // Nach Materialname suchen, nicht nach Mesh-Name
+  // Wir verwenden materialbasierte Suche für den C63 AMG (speziell für Karosserie und Interieur)
+  useMaterialNameInsteadOfMeshName: true,
   scale: 0.2, // Korrekte Skalierung für das Modell
   // Position-Eigenschaft entfernt, um automatische Zentrierung zu nutzen
   rotation: {
-    x: 0, 
-    y: 0, 
+    x: 0,
+    y: Math.PI, // 180 Grad in Radiant, damit das Fahrzeug in die richtige Richtung zeigt
     z: 0
   },
   cameraPosition: {
     x: 0,
-    y: 1,
+    y: 1.5,
     z: 5
   }
 };

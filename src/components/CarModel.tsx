@@ -158,6 +158,41 @@ export default function CarModel({
 
   useEffect(() => {
     if (!isInitialRender) {
+      // Spezielle Behandlung für C63 AMG: Zuerst Glas-Materialien färben
+      if (config.modelFile.includes('c63_amg')) {
+        scene.traverse((child) => {
+          if (child instanceof THREE.Mesh && child.material) {
+            // Behandle alle potenziellen Glas-Materialien
+            const handleGlassMaterial = (material) => {
+              if (material.name && 
+                  (material.name.toLowerCase().includes('glass') || 
+                   material.name.toLowerCase().includes('window') || 
+                   material.name.toLowerCase().includes('windshield') || 
+                   material.name.toLowerCase().includes('scheibe') || 
+                   material.name === config.materials.glass)) {
+                
+                // Setze die Glasfarbe
+                const glassColor = config.initialGlassColor || '#000000';
+                material.color.set(glassColor);
+                material.transparent = true;
+                material.opacity = 0.7;
+                
+                if (config.debug) {
+                  console.log(`C63 AMG: Glasfarbe vorweg gesetzt für Material: ${material.name}, Farbe: ${glassColor}`);
+                }
+              }
+            };
+            
+            // Behandle sowohl Arrays von Materialien als auch einzelne Materialien
+            if (Array.isArray(child.material)) {
+              child.material.forEach(handleGlassMaterial);
+            } else {
+              handleGlassMaterial(child.material);
+            }
+          }
+        });
+      }
+
       scene.traverse((child) => {
         if (child instanceof THREE.Mesh) {
           child.material.needsUpdate = true
@@ -225,6 +260,30 @@ export default function CarModel({
               transparent: true,
               blending: THREE.AdditiveBlending
             });
+            
+            // Nur für das C63 AMG-Modell spezielle Z-Buffer-Einstellungen
+            if (config.modelFile.includes('c63_amg')) {
+              // Prüfe, ob es spezielle Rendering-Optionen gibt
+              const renderOptions = config.drlConfig?.renderOptions;
+              
+              // Grundlegende Z-Buffer-Optimierungen
+              drlMaterial.depthWrite = false;      // Verhindert Z-Fighting
+              drlMaterial.depthTest = true;        // Aber immer noch Tiefentest durchführen
+              
+              // Spezielle Render-Reihenfolge, wenn konfiguriert
+              if (renderOptions?.customRenderOrder) {
+                const priority = renderOptions.renderingPriority || 2;
+                child.renderOrder = priority;
+                
+                // Bei höherer Priorität auch stärkere Z-Buffer-Optimierung
+                if (priority > 1) {
+                  drlMaterial.polygonOffset = true;
+                  drlMaterial.polygonOffsetFactor = -1 * priority;
+                  drlMaterial.polygonOffsetUnits = -1 * priority;
+                }
+              }
+            }
+            
             child.material = drlMaterial;
           } 
           else if (isStandardDrl) {
@@ -237,6 +296,30 @@ export default function CarModel({
               transparent: true,
               blending: THREE.AdditiveBlending
             });
+            
+            // Auch für Standard-DRLs des C63 AMG
+            if (config.modelFile.includes('c63_amg')) {
+              // Prüfe, ob es spezielle Rendering-Optionen gibt
+              const renderOptions = config.drlConfig?.renderOptions;
+              
+              // Grundlegende Z-Buffer-Optimierungen
+              drlMaterial.depthWrite = false;
+              drlMaterial.depthTest = true;
+              
+              // Spezielle Render-Reihenfolge, wenn konfiguriert
+              if (renderOptions?.customRenderOrder) {
+                const priority = (renderOptions.renderingPriority || 2) - 1; // Etwas geringere Priorität als spezifische DRLs
+                child.renderOrder = priority;
+                
+                // Bei höherer Priorität auch stärkere Z-Buffer-Optimierung
+                if (priority > 1) {
+                  drlMaterial.polygonOffset = true;
+                  drlMaterial.polygonOffsetFactor = -1 * priority;
+                  drlMaterial.polygonOffsetUnits = -1 * priority;
+                }
+              }
+            }
+            
             child.material = drlMaterial;
           }
           else if (child.name === "Object_42") {
@@ -311,12 +394,30 @@ export default function CarModel({
                 child.material.transparent = true;
                 child.material.opacity = 0.7; 
               }
+              // Debug-Ausgabe für C63 AMG
+              if (config.debug && config.modelFile.includes('c63_amg')) {
+                console.log(`Glasfarbe gesetzt für ${isGlassByMaterial ? 'Material' : 'Mesh'}: ${child.name}, Farbe: ${glassColor}`);
+              }
             }
           }
           else if (config.useMaterialNameInsteadOfMeshName && child.material && !Array.isArray(child.material)) {
             const materialName = child.material.name;
             
-            if ((config.modelFile.includes('m4_f82') || config.modelFile.includes('m8_f92')) && 
+            // Prüfen, ob dies ein Glasmaterial ist
+            const isGlassMaterial = config.materials.glass && materialName === config.materials.glass;
+            
+            if (isGlassMaterial) {
+              const glassColor = config.initialGlassColor || '#000000';
+              child.material.color.set(glassColor);
+              child.material.transparent = true;
+              child.material.opacity = 0.7;
+              
+              if (config.debug && config.modelFile.includes('c63_amg')) {
+                console.log(`Glasfarbe gesetzt für Material: ${materialName}, Farbe: ${glassColor}`);
+              }
+            }
+            // BMW spezifische Behandlung
+            else if ((config.modelFile.includes('m4_f82') || config.modelFile.includes('m8_f92')) && 
                 (materialName === config.materials.body || child.name === config.materials.body)) {
               // Lackierungswerte direkt setzen, ohne Material zu ersetzen
               child.material.metalness = 0.6;
@@ -405,6 +506,56 @@ export default function CarModel({
           }
         }
       })
+
+      // Debug-Information für C63 AMG
+      if (config.debug && config.modelFile.includes('c63_amg')) {
+        console.log('=== DEBUGGING C63 AMG MODELL ===');
+        console.log('Config:', {
+          materialGlass: config.materials.glass,
+          materialBody: config.materials.body,
+          useMaterialNameInsteadOfMeshName: config.useMaterialNameInsteadOfMeshName,
+          initialGlassColor: config.initialGlassColor
+        });
+        
+        // Prüfe alle Mesh- und Materialnamen
+        scene.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            if (child.material) {
+              if (Array.isArray(child.material)) {
+                child.material.forEach((mat, index) => {
+                  console.log(`Mesh: ${child.name}, Material[${index}]: ${mat.name}`);
+                });
+              } else {
+                console.log(`Mesh: ${child.name}, Material: ${child.material.name}`);
+                
+                // Prüfe, ob dieses Mesh oder Material zum Glass gehört
+                if (child.name === config.materials.glass || 
+                    (child.material.name === config.materials.glass) ||
+                    child.name.toLowerCase().includes('glass') || 
+                    child.name.toLowerCase().includes('window') ||
+                    child.name.toLowerCase().includes('scheibe')) {
+                  console.log('GLASS CANDIDATE FOUND:', {
+                    mesh: child.name,
+                    material: child.material.name,
+                    isGlassByMeshConfig: child.name === config.materials.glass,
+                    isGlassByMaterialConfig: child.material.name === config.materials.glass,
+                  });
+                  
+                  // Versuche sofort die Glasfarbe zu setzen
+                  const glassColor = config.initialGlassColor || '#000000';
+                  child.material.color.set(glassColor);
+                  child.material.transparent = true;
+                  child.material.opacity = 0.7;
+                  console.log(`Glasfarbe vorab gesetzt auf: ${glassColor} für ${child.name}`);
+                }
+              }
+            } else {
+              console.log(`Mesh ohne Material: ${child.name}`);
+            }
+          }
+        });
+        console.log('=== ENDE DEBUGGING C63 AMG ===');
+      }
     }
   }, [scene, bodyColor, wheelColor, drlColor, interiorMainColor, interiorSecondaryColor, isInitialRender, config, drlUniforms])
 
