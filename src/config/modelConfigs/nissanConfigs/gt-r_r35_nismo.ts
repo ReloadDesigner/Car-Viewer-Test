@@ -7,7 +7,7 @@ export const gtrR35NismoConfig: CarConfig = {
   materials: {
     body: "Object_23", // Karosserie-Material
     wheel: "Object_64", // Räder-Material
-    drl: "Object_5", // DRL Mesh-Name (wird in diesem Fall nicht direkt verwendet, aber für Kompatibilität beibehalten)
+    drl: "Object_5", // DRL Mesh-Name
     interiorMain: "material", // Interior Haupt-Material
     interiorSecondary: "Object_4", // Interior Sekundär-Material
     glass: "Object_10" // Glas-Material (für Scheiben)
@@ -18,7 +18,7 @@ export const gtrR35NismoConfig: CarConfig = {
   // Nur die folgenden Meshes sollen als Tagfahrlichter gefärbt werden
   drlConfig: {
     meshFilter: ["Object_5"], // Nur Object_5 (Frontscheinwerfer) als DRL behandeln
-    materialName: "material_11" // Nicht mehr verwendet in der neuen Implementierung, aber für Referenz behalten
+    materialName: "material_11" // Das Material des DRL-Elements
   },
   // Anpassungen für das GT-R Modell
   scale: 0.01, // Kleinere Skalierung für das GT-R Modell

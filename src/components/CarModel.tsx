@@ -162,21 +162,87 @@ export default function CarModel({
         if (child instanceof THREE.Mesh) {
           child.material.needsUpdate = true
           
-          const isDrlMesh = config.drlConfig && config.drlConfig.meshFilter.includes(child.name);
-          const isStandardDrl = !config.drlConfig && child.name.includes(config.materials.drl);
+          // DRL-Erkennung je nach Modell anpassen
+          const isDrlMesh = config.drlConfig && (
+            // Allgemeine Prüfung für alle Modelle - prüft, ob der Mesh im definierten meshFilter ist
+            config.drlConfig.meshFilter.includes(child.name) ||
+            
+            // MERCEDES SPEZIFISCH: Spezifische Prüfung für das A45 AMG DRL
+            (config.modelFile.includes('a45_amg') && (
+              (child.name === "Material3_20" && child.material && child.material.name === "material_7") ||
+              child.id === 64 // Material3_20 hat die ID 64 (aus der Debug-Tabelle)
+            ))
+          );
+          
+          // Für Modelle ohne drlConfig
+          const isStandardDrl = !config.drlConfig && (
+            // Allgemeine Prüfung für alle Modelle
+            child.name.includes(config.materials.drl) ||
+            
+            // MERCEDES SPEZIFISCH: Für A45 AMG Standard-DRL (wenn keine drlConfig verwendet wird)
+            (config.modelFile.includes('a45_amg') && (
+              (child.material && child.material.name === "material_7") ||
+              child.name === "Material3_20"
+            ))
+          );
           
           const isWheelByMeshName = config.materials.wheel && 
                                      (child.name === config.materials.wheel || 
                                      (config.wheelConfig && 
                                       (child.name.includes(config.wheelConfig.materialName) || 
-                                       child.name === config.wheelConfig.materialName)) ||
+                                       child.name === config.wheelConfig.materialName ||
+                                       child.name === config.wheelConfig.meshName || // Direkte Prüfung auf den Mesh-Namen
+                                       child.name.includes(config.wheelConfig.meshName))) || // Teilweise Übereinstimmung
                                      child.name.includes(config.materials.wheel));
-                                     
+          
+          const isA45Wheel = child.name === "Material2_22" || 
+                             (child.material && child.material.name === "material_29");
+          
+          // Spezifische Prüfung für den A45 AMG Innenraum
+          const isA45Interior = child.name === "Material3_31" || 
+                               (child.material && child.material.name === "Seats1");
+          
+          // Spezifische Prüfung für den A45 AMG sekundären Innenraum (Armaturenbrett)
+          const isA45SecondaryInterior = child.name === "Material2_26" || 
+                                         (child.material && child.material.name === "Dash1");
+          
+          const isGlassByMaterial = config.materials.glass && 
+            config.useMaterialNameInsteadOfMeshName && 
+            child.material && 
+            !Array.isArray(child.material) &&
+            child.material.name === config.materials.glass;
+          
           const isGlassByMeshName = config.materials.glass && child.name === config.materials.glass;
           
           if (isDrlMesh) {
+            console.log(`DRL-Mesh gefunden: ${child.name} mit Material: ${child.material.name}, ID: ${child.id}`);
+            
+            // Spezifische Anpassungen für das A45 AMG DRL
+            let glowIntensity = 0.5;
+            let baseColorMultiplier = 1.5;
+            
+            // Nur für Mercedes A45 AMG spezifische Intensitätseinstellungen
+            if (config.modelFile.includes('a45_amg') && 
+                ((child.name === "Material3_20" && child.material && child.material.name === "material_7") ||
+                 child.id === 64)) {
+              glowIntensity = 1.0; // Höhere Intensität für bessere Sichtbarkeit
+              baseColorMultiplier = 2.5; // Stärkere Farbe für das DRL
+            }
+            
+            // Für den GT-R ein spezielles Setting
+            if (config.modelFile.includes('gt-r_r35_nismo') && child.name === "Object_5") {
+              glowIntensity = 0.8;
+              baseColorMultiplier = 2.0;
+            }
+            
+            // Angepasste Uniforms für den Shader
+            const customUniforms = {
+              baseColor: { value: new THREE.Color(drlColor).multiplyScalar(baseColorMultiplier) },
+              glowIntensity: { value: glowIntensity }
+            };
+            
             const drlMaterial = new THREE.ShaderMaterial({
-              uniforms: drlUniforms,
+              uniforms: customUniforms,
               vertexShader: drlVertexShader,
               fragmentShader: drlFragmentShader,
               transparent: true,
@@ -185,6 +251,8 @@ export default function CarModel({
             child.material = drlMaterial;
           } 
           else if (isStandardDrl) {
+            console.log(`Standard-DRL gefunden: ${child.name} mit Material: ${child.material.name}`);
+            
             const drlMaterial = new THREE.ShaderMaterial({
               uniforms: drlUniforms,
               vertexShader: drlVertexShader,
@@ -212,7 +280,7 @@ export default function CarModel({
               }
             }
           }
-          else if (isWheelByMeshName) {
+          else if (isWheelByMeshName || isA45Wheel) {
             if (child.material) {
               if (config.wheelConfig && (child.name.includes(config.wheelConfig.materialName) || child.name === config.wheelConfig.materialName)) {
                 if (config.wheelConfig.requiresCloning) {
@@ -252,7 +320,29 @@ export default function CarModel({
               }
             }
           }
-          else if (isGlassByMeshName) {
+          else if (isA45Interior) {
+            if (child.material) {
+              if (Array.isArray(child.material)) {
+                child.material.forEach(mat => {
+                  mat.color.set(interiorMainColor);
+                });
+              } else {
+                child.material.color.set(interiorMainColor);
+              }
+            }
+          }
+          else if (isA45SecondaryInterior) {
+            if (child.material) {
+              if (Array.isArray(child.material)) {
+                child.material.forEach(mat => {
+                  mat.color.set(interiorSecondaryColor);
+                });
+              } else {
+                child.material.color.set(interiorSecondaryColor);
+              }
+            }
+          }
+          else if (isGlassByMaterial || isGlassByMeshName) {
             if (child.material) {
               const glassColor = config.initialGlassColor || '#000000'; 
               if (Array.isArray(child.material)) {
@@ -271,27 +361,51 @@ export default function CarModel({
           else if (config.useMaterialNameInsteadOfMeshName && child.material && !Array.isArray(child.material)) {
             const materialName = child.material.name;
             
-            if (materialName === config.materials.body) {
+            if ((config.modelFile.includes('m4_f82') || config.modelFile.includes('m8_f92')) && 
+                (materialName === config.materials.body || child.name === config.materials.body)) {
+              child.material.metalness = 0.6;
+              child.material.roughness = 0.39;
+              child.material.clearcoat = 1.0;
+              child.material.clearcoatRoughness = 0.04;
+              child.material.needsUpdate = true;
               child.material.color.set(bodyColor);
-            } 
-            else if (materialName === config.materials.wheel) {
-              child.material.color.set(wheelColor);
-            } 
-            else if (Array.isArray(config.materials.interiorMain) && config.materials.interiorMain.includes(materialName)) {
-              child.material.color.set(interiorMainColor);
-            }
-            else if (!Array.isArray(config.materials.interiorMain) && materialName === config.materials.interiorMain) {
-              child.material.color.set(interiorMainColor);
-            }
-            else if (materialName === config.materials.interiorSecondary) {
-              child.material.color.set(interiorSecondaryColor);
-            }
-            else if (config.materials.glass && materialName === config.materials.glass) {
-              const glassColor = config.initialGlassColor || '#000000';
-              child.material.color.set(glassColor);
+              console.log(`BMW Lack verbessert für ${materialName}`);
+            } else {
+              if (materialName === config.materials.body) {
+                child.material.color.set(bodyColor);
+              } 
+              else if (materialName === config.materials.wheel) {
+                child.material.color.set(wheelColor);
+              } 
+              else if (Array.isArray(config.materials.interiorMain) && config.materials.interiorMain.includes(materialName)) {
+                child.material.color.set(interiorMainColor);
+              }
+              else if (!Array.isArray(config.materials.interiorMain) && materialName === config.materials.interiorMain) {
+                child.material.color.set(interiorMainColor);
+              }
+              else if (materialName === config.materials.interiorSecondary) {
+                child.material.color.set(interiorSecondaryColor);
+              }
+              else if (config.materials.glass && materialName === config.materials.glass) {
+                const glassColor = config.initialGlassColor || '#000000';
+                child.material.color.set(glassColor);
+              }
             }
           } else {
-            if (child.name === config.materials.body) {
+            if ((config.modelFile.includes('m4_f82') || config.modelFile.includes('m8_f92')) && 
+                child.name === config.materials.body && child.material && !Array.isArray(child.material)) {
+              // Lackierungswerte direkt setzen, ohne Material zu ersetzen
+              child.material.metalness = 0.6;
+              child.material.roughness = 0.39;
+              child.material.clearcoat = 1.0;
+              child.material.clearcoatRoughness = 0.04;
+              child.material.needsUpdate = true;
+              
+              // Farbe setzen
+              child.material.color.set(bodyColor);
+              console.log(`BMW Lack verbessert für ${child.name}`);
+            }
+            else if (child.name === config.materials.body) {
               child.material.color.set(bodyColor)
             } 
             else if (Array.isArray(config.materials.interiorMain) && config.materials.interiorMain.includes(child.name)) {
