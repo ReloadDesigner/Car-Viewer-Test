@@ -326,21 +326,18 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
     }
   };
 
-  // Disclaimer-Dialog nur beim ersten Besuch anzeigen
+  // Disclaimer-Dialog bei jedem Laden der Seite anzeigen
   useEffect(() => {
-    const hasSeenDisclaimer = localStorage.getItem('hasSeenDisclaimer') === 'true'
-    if (!hasSeenDisclaimer && !isModelLoading && !modelTransitioning) {
-      // Kurze Verzögerung, damit der Disclaimer nach vollständigem Laden erscheint
-      const timer = setTimeout(() => {
-        setShowDisclaimerDialog(true)
-      }, 1000)
-      return () => clearTimeout(timer)
-    }
-  }, [isModelLoading, modelTransitioning])
+    // Kurze Verzögerung, damit der Disclaimer nach vollständigem Laden erscheint
+    const timer = setTimeout(() => {
+      setShowDisclaimerDialog(true)
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, []) // Leeres Dependency-Array bedeutet: nur beim ersten Laden der Komponente ausführen
 
-  // Disclaimer als gesehen markieren
+  // Disclaimer schließen
   const acknowledgeDisclaimer = () => {
-    localStorage.setItem('hasSeenDisclaimer', 'true')
+    // Keine Speicherung mehr, damit der Dialog bei jedem Refresh erscheint
     setShowDisclaimerDialog(false)
   }
 
@@ -507,14 +504,15 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
             onClick={acknowledgeDisclaimer}
           >
             <motion.div 
-              className="bg-slate-900 p-6 rounded-lg max-w-md w-full border border-white/10 shadow-xl"
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
+              className="bg-gradient-to-b from-slate-800 to-slate-900 p-8 rounded-lg max-w-md w-full border border-blue-400/20 shadow-2xl"
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
               onClick={e => e.stopPropagation()}
             >
-              <h2 className="text-xl font-bold text-white mb-3">Important Notice</h2>
-              <p className="text-gray-300 mb-4">
+              <h2 className="text-2xl font-bold text-white mb-5 border-b border-blue-400/30 pb-2">Important Notice</h2>
+              <p className="text-gray-200 mb-6 leading-relaxed">
                 This 3D visualization is for approximate representation only. 
                 Actual colors, materials, and lighting effects may differ from what is displayed 
                 in this model. This simulation is intended as a guide only and does not 
@@ -522,9 +520,9 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
               </p>
               <button
                 onClick={acknowledgeDisclaimer}
-                className="w-full px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200"
+                className="w-full px-4 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 font-medium text-white transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
               >
-                Understood
+                I Understand
               </button>
             </motion.div>
           </motion.div>
@@ -555,7 +553,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
             onClick={() => setShowLicenseInfo(false)}
           >
             <motion.div 
-              className="bg-slate-900 p-6 rounded-lg max-w-xl w-full border border-white/10 shadow-xl max-h-[80vh] flex flex-col"
+              className="bg-slate-900 p-6 rounded-lg max-w-xl w-full border border-white/10 shadow-xl max-h-[80vh] overflow-y-auto"
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
@@ -573,13 +571,11 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                 </button>
               </div>
               
-              <div className="text-gray-300 text-sm">
+              <div className="text-gray-300 text-sm space-y-4 overflow-y-auto">
                 <p className="border-b border-white/10 pb-2">
                   The 3D models in this configurator are subject to the following license terms:
                 </p>
-              </div>
                 
-              <div className="text-gray-300 text-sm space-y-4 my-4 flex-1 overflow-y-auto pr-2">
                 <div>
                   <h3 className="font-semibold mb-1">BMW M4 F82</h3>
                   <p className="text-xs text-gray-400">
@@ -607,10 +603,8 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                     This work is based on "Nissan GT-R R35 Nismo | www.vecarz.com" (https://sketchfab.com/3d-models/nissan-gt-r-r35-nismo-wwwvecarzcom-9cfbe4727b7f4af0a11772687c4a1f59) by vecarz (https://sketchfab.com/heynic) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
                   </p>
                 </div>
-              </div>
-              
-              <div className="text-gray-300 text-sm mt-2 pt-2 border-t border-white/10">
-                <p className="text-xs italic">
+                
+                <p className="pt-2 text-xs italic">
                   All vehicle brands, logos, and model designations are the property of their respective manufacturers and are used here
                   for informational purposes only. This application is not affiliated with or endorsed by the vehicle manufacturers.
                 </p>
