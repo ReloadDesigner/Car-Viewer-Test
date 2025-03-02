@@ -1,9 +1,10 @@
-'use client'
+﻿'use client'
 
 import React, { Suspense, useState, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, ContactShadows, ACESFilmicToneMapping } from '@react-three/drei'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { motion as motion3d } from 'framer-motion-3d'
 import { Camera, Palette, Car, SunDim, PaintBucket, CircleDot, Lightbulb, Layers, Component, GripHorizontal, Baseline, RotateCw } from 'lucide-react'
 import * as THREE from 'three'
@@ -15,6 +16,7 @@ import LoadButton from './LoadButton'
 import { CarConfig, ModelConfig } from '../types/carConfig'
 import { m4_f82Config } from '../config/modelConfigs/bmwConfigs/m4_f82'
 import { m8_f92Config } from '../config/modelConfigs/bmwConfigs/m8_f92';
+import { a45_amgConfig } from '../config/modelConfigs/mercedesConfigs/a-class_a45_amg';
 import { gtrR35NismoConfig } from '../config/modelConfigs/nissanConfigs/gt-r_r35_nismo';
 import Image from 'next/image'
 
@@ -28,7 +30,7 @@ const carBrands = ['Audi', 'BMW', 'Mercedes', 'Nissan']
 const carModels = {
   BMW: ['4 Series/M4 (F3X/F8X)', '8 Series/M8 (F9X)', 'X5'],
   Audi: ['A4', 'A6', 'Q5'],
-  Mercedes: ['C-Class', 'E-Class', 'GLC'],
+  Mercedes: ['A-Class (A45 AMG)','C-Class', 'E-Class', 'GLC'],
   Nissan: ['GT-R (R35/Nismo)'],
 }
 
@@ -39,6 +41,7 @@ const carConfigs: ModelConfig = {
   'Audi_A4': m4_f82Config, // Temporär das gleiche Modell für A4
   'Audi_A6': m4_f82Config, // Temporär das gleiche Modell für A6
   'Audi_Q5': m4_f82Config, // Temporär das gleiche Modell für Q5
+  'Mercedes_A-Class (A45 AMG)': a45_amgConfig,
   'Mercedes_C-Class': m4_f82Config, // Temporär das gleiche Modell für C-Class
   'Mercedes_E-Class': m4_f82Config, // Temporär das gleiche Modell für E-Class
   'Mercedes_GLC': m4_f82Config, // Temporär das gleiche Modell für GLC
@@ -149,6 +152,18 @@ function AutoRotate({
   )
 }
 
+// Komponente für den Lade-Indikator
+const LoadingOverlay = () => {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
+      <div className="flex flex-col items-center">
+        <div className="w-16 h-16 border-4 border-t-blue-500 border-gray-200 rounded-full animate-spin"></div>
+        <p className="mt-4 text-white text-xl">Loading Model...</p>
+      </div>
+    </div>
+  );
+};
+
 export default function Configurator({ initialBrand, initialModel }: ConfiguratorProps) {
   const [selectedBrand, setSelectedBrand] = useState(initialBrand)
   const [selectedModel, setSelectedModel] = useState(initialModel)
@@ -183,6 +198,12 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
   const [showDisclaimerDialog, setShowDisclaimerDialog] = useState(false)
   const [showLicenseInfo, setShowLicenseInfo] = useState(false)
 
+  // Entfernen der nicht mehr benötigten Ref für OrbitControls
+  // const [orbitControlsRef, setOrbitControlsRef] = useState(null);
+
+  // Canvas-Schlüssel für komplette Neuinitialisierung
+  const [canvasKey, setCanvasKey] = useState(0);
+
   const hasColorChanges = () => {
     return (
       bodyColor !== originalColors.body ||
@@ -208,9 +229,10 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
   const handleLoadModel = async () => {
     setShowResetColorsDialog(false);
     
-    setSlideDirection('out')
-    setModelTransitioning(true)
+    // Lade-Indikator anzeigen
     setIsModelLoading(true)
+    setModelTransitioning(true)
+    setSlideDirection('out')
     
     await new Promise(resolve => setTimeout(resolve, 700))
     
@@ -219,18 +241,22 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
     setSelectedModel(tempModel)
     setCarConfig(carConfigs[configKey] || carConfigs['BMW_8 Series/M8 (F9X)'])
     
+    // Reset des Canvas durch Schlüsseländerung
+    setCanvasKey(prevKey => prevKey + 1);
+    
     setInitialPosition(-10)
     
-    await new Promise(resolve => setTimeout(resolve, 200))
+    await new Promise(resolve => setTimeout(resolve, 500)) // Längere Wartezeit, um sicherzustellen, dass das Canvas zurückgesetzt wird
     
     setSlideDirection('in')
     
+    // Längere Verzögerung für die volle Animation
     setTimeout(() => {
       setSlideDirection('none')
       setInitialPosition(null)
       setModelTransitioning(false)
       setIsModelLoading(false)
-    }, 800)
+    }, 1200)
   }
 
   useEffect(() => {
@@ -264,6 +290,9 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
     setInteriorMainColor(originalColors.interiorMain)
     setInteriorSecondaryColor(originalColors.interiorSecondary)
   }, [originalColors])
+
+  // Entfernen der nicht mehr benötigten useEffects und States für das OrbitControl-Target
+  // Diese werden durch den Canvas-Reset-Ansatz ersetzt
 
   const handleCustomColor = (setColor: (color: string) => void) => {
     setShowCustomColorPicker(true)
@@ -589,12 +618,14 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
         {/* 3D Viewer */}
         <div className="absolute inset-0">
           <Canvas 
+            key={`canvas-${canvasKey}-${selectedModel}`}
             shadows 
             camera={{ position: [15, 5, 15], fov: isMobile ? 65 : 50 }}
             gl={{ 
-              toneMapping: THREE.ACESFilmicToneMapping,
-              toneMappingExposure: 0.6,
-              antialias: true,
+              antialias: true, 
+              toneMapping: ACESFilmicToneMapping,
+              toneMappingExposure: 1.0,
+              outputEncoding: THREE.sRGBEncoding
             }}
             style={{
               position: 'absolute',
@@ -659,7 +690,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
               dampingFactor={0.05}
               rotateSpeed={isMobile ? 0.7 : 1}
               zoomSpeed={isMobile ? 0.7 : 1}
-              target={new THREE.Vector3(0, 1, 0)}
+              target={selectedModel === 'A-Class (A45 AMG)' ? new THREE.Vector3(0, 0.5, 0) : new THREE.Vector3(0, 1, 0)}
             />
           </Canvas>
 
@@ -919,6 +950,9 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Lade-Indikator */}
+          {isModelLoading && <LoadingOverlay />}
         </div>
       </div>
     </div>

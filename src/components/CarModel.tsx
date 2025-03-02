@@ -72,6 +72,7 @@ export default function CarModel({
   const groupRef = useRef<THREE.Group>(null)
   const { camera } = useThree()
   const [isInitialRender, setIsInitialRender] = useState(true)
+  const [modelLoaded, setModelLoaded] = useState(false);
 
   const drlUniforms = useMemo(() => {
     return {
@@ -152,6 +153,7 @@ export default function CarModel({
 
     setOriginalColors(originalColors)
     setIsInitialRender(false)
+    setModelLoaded(true);
   }, [scene, setOriginalColors, config])
 
   useEffect(() => {
@@ -317,9 +319,16 @@ export default function CarModel({
         groupRef.current.scale.set(config.scale, config.scale, config.scale);
       }
 
+      const box = new THREE.Box3().setFromObject(groupRef.current)
+      const center = box.getCenter(new THREE.Vector3())
+      const size = box.getSize(new THREE.Vector3())
+
+      // Immer erst die Bounding Box berechnen, bevor wir die Position setzen
       if (config.position) {
         const { x, y, z } = config.position;
         groupRef.current.position.set(x, y, z);
+      } else {
+        groupRef.current.position.set(-center.x, -box.min.y, -center.z)
       }
 
       if (config.rotation) {
@@ -329,14 +338,6 @@ export default function CarModel({
           y * (Math.PI / 180), 
           z * (Math.PI / 180)
         );
-      }
-
-      const box = new THREE.Box3().setFromObject(groupRef.current)
-      const center = box.getCenter(new THREE.Vector3())
-      const size = box.getSize(new THREE.Vector3())
-
-      if (!config.position) {
-        groupRef.current.position.set(-center.x, -box.min.y, -center.z)
       }
 
       const fov = camera.fov * (Math.PI / 180)
