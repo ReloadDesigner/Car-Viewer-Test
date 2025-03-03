@@ -165,7 +165,14 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
   const [selectedBrand, setSelectedBrand] = useState(initialBrand)
   const [selectedModel, setSelectedModel] = useState(initialModel)
   const [carConfig, setCarConfig] = useState<CarConfig>(carConfigs[`${initialBrand}_${initialModel}`])
-  const [originalColors, setOriginalColors] = useState({
+  const [originalColors, setOriginalColors] = useState<{
+    body: string | null;
+    wheel: string | null;
+    drl: string;
+    interiorMain: string | null;
+    interiorSecondary: string | null;
+    glass: string | null;
+  }>({
     body: null,
     wheel: null,
     drl: '#FFFFFF',
