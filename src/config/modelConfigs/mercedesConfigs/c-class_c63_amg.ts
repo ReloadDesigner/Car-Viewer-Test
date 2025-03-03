@@ -41,7 +41,7 @@ export const c63_amgConfig: CarConfig = {
   },
   // Wir verwenden materialbasierte Suche für den C63 AMG (speziell für Karosserie und Interieur)
   useMaterialNameInsteadOfMeshName: true,
-  scale: 0.2, // Korrekte Skalierung für das Modell
+  scale: 0.24, // Korrekte Skalierung für das Modell
   // Position-Eigenschaft entfernt, um automatische Zentrierung zu nutzen
   rotation: {
     x: 0,

@@ -27,7 +27,7 @@ export const grSupraConfig: CarConfig = {
     }
   },
   // Anpassungen für das GR Supra Modell
-  scale: 1.0, // Vorläufige Skalierung, kann angepasst werden
+  scale: 1.4, // Vorläufige Skalierung, kann angepasst werden
   position: {
     x: 0,
     y: 0,
