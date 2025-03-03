@@ -2,7 +2,8 @@
 
 import React, { Suspense, useState, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
-import { OrbitControls, Environment, ContactShadows, ACESFilmicToneMapping } from '@react-three/drei'
+import { OrbitControls, Environment, ContactShadows } from '@react-three/drei'
+import { ACESFilmicToneMapping } from 'three';
 import { motion } from 'framer-motion'
 import { AnimatePresence } from 'framer-motion'
 import { motion as motion3d } from 'framer-motion-3d'
