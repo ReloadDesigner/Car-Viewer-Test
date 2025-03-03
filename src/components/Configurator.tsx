@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import React, { Suspense, useState, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
@@ -116,10 +116,11 @@ function AutoRotate({
     drl: string;
     interiorMain: string | null;
     interiorSecondary: string | null;
+    glass: string | null;
   }) => void;
 }) {
   const { scene } = useThree()
-  const rotationGroup = useRef<THREE.Group>()
+  const rotationGroup = useRef<THREE.Group>(null)
   
   useEffect(() => {
     if (rotationGroup.current) {
@@ -169,7 +170,8 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
     wheel: null,
     drl: '#FFFFFF',
     interiorMain: null,
-    interiorSecondary: null
+    interiorSecondary: null,
+    glass: null
   })
   const [bodyColor, setBodyColor] = useState<string | null>(null)
   const [wheelColor, setWheelColor] = useState<string | null>(null)
@@ -633,7 +635,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
               antialias: true, 
               toneMapping: ACESFilmicToneMapping,
               toneMappingExposure: 1.0,
-              outputEncoding: THREE.sRGBEncoding
+              outputColorSpace: 'srgb'
             }}
             style={{
               position: 'absolute',
