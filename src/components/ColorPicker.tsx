@@ -35,13 +35,13 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
     if (showCustomPicker) {
       onChange(customColor)
     }
-  }, [customColor])
+  }, [customColor, showCustomPicker, onChange])
 
   useEffect(() => {
     if (showCustomPicker) {
       setOriginalColor(selectedColor)
     }
-  }, [showCustomPicker])
+  }, [showCustomPicker, selectedColor])
 
   const getEffectStyles = (color: Color) => {
     switch (effect) {

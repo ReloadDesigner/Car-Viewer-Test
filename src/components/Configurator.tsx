@@ -7,10 +7,9 @@ import { ACESFilmicToneMapping } from 'three';
 import { motion } from 'framer-motion'
 import { AnimatePresence } from 'framer-motion'
 import { motion as motion3d } from 'framer-motion-3d'
-import { Camera, Palette, Car, SunDim, PaintBucket, CircleDot, Lightbulb, Layers, Component, GripHorizontal, Baseline, RotateCw } from 'lucide-react'
+import { Camera, Palette, Car, SunDim, PaintBucket, CircleDot, Lightbulb, Layers, Component, RotateCw } from 'lucide-react'
 import * as THREE from 'three'
 import CarModel from './CarModel'
-import Dropdown from './Dropdown'
 import ColorPicker from './ColorPicker'
 import ConfigSection from './ConfigSection'
 import LoadButton from './LoadButton'
@@ -43,15 +42,6 @@ const carConfigs: ModelConfig = {
   'Nissan_GT-R (R35/Nismo)': gtrR35NismoConfig,
   'Toyota_GR Supra': grSupraConfig
 }
-
-const drlColors = [
-  { name: 'White', hex: '#FFFFFF' },
-  { name: 'Yellow', hex: '#FFFF00' },
-  { name: 'Orange', hex: '#FFA500' },
-  { name: 'Red', hex: '#FF0000' },
-  { name: 'Blue', hex: '#0000FF' },
-  { name: 'Green', hex: '#00FF00' },
-]
 
 const environmentPresets = [
   { name: 'Studio', value: 'studio' },
@@ -119,7 +109,6 @@ function AutoRotate({
     glass: string | null;
   }) => void;
 }) {
-  const { scene } = useThree()
   const rotationGroup = useRef<THREE.Group>(null)
   
   useEffect(() => {
@@ -196,18 +185,11 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
   const [tempModel, setTempModel] = useState(selectedModel)
   const [isModelLoading, setIsModelLoading] = useState(false)
   const [autoRotate, setAutoRotate] = useState(false)
-  const [modelTransitioning, setModelTransitioning] = useState(false) // Track when model is transitioning
   const [slideDirection, setSlideDirection] = useState<'none' | 'out' | 'in'>('none') // Track slide animation phase
   const [initialPosition, setInitialPosition] = useState<number | null>(null) // Track initial position for slide-in
   const [showResetColorsDialog, setShowResetColorsDialog] = useState(false)
   const [showDisclaimerDialog, setShowDisclaimerDialog] = useState(false)
   const [showLicenseInfo, setShowLicenseInfo] = useState(false)
-
-  // Entfernen der nicht mehr benötigten Ref für OrbitControls
-  // const [orbitControlsRef, setOrbitControlsRef] = useState(null);
-
-  // Canvas-Schlüssel für komplette Neuinitialisierung
-  const [canvasKey, setCanvasKey] = useState(0);
 
   const hasColorChanges = () => {
     return (
@@ -236,7 +218,6 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
     
     // Lade-Indikator anzeigen
     setIsModelLoading(true)
-    setModelTransitioning(true)
     setSlideDirection('out')
     
     await new Promise(resolve => setTimeout(resolve, 700))
@@ -247,8 +228,6 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
     setCarConfig(carConfigs[configKey] || carConfigs['BMW_8 Series/M8 (F9X)'])
     
     // Reset des Canvas durch Schlüsseländerung
-    setCanvasKey(prevKey => prevKey + 1);
-    
     setInitialPosition(-10)
     
     await new Promise(resolve => setTimeout(resolve, 500)) // Längere Wartezeit, um sicherzustellen, dass das Canvas zurückgesetzt wird
@@ -259,7 +238,6 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
     setTimeout(() => {
       setSlideDirection('none')
       setInitialPosition(null)
-      setModelTransitioning(false)
       setIsModelLoading(false)
     }, 1200)
   }
@@ -291,15 +269,11 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
   useEffect(() => {
     setBodyColor(originalColors.body)
     setWheelColor(originalColors.wheel)
-    setDrlColor('#FFFFFF')
     setInteriorMainColor(originalColors.interiorMain)
     setInteriorSecondaryColor(originalColors.interiorSecondary)
   }, [originalColors])
 
-  // Entfernen der nicht mehr benötigten useEffects und States für das OrbitControl-Target
-  // Diese werden durch den Canvas-Reset-Ansatz ersetzt
-
-  const handleCustomColor = (setColor: (color: string) => void) => {
+  const handleCustomColor = () => {
     setShowCustomColorPicker(true)
   }
 
@@ -588,35 +562,35 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                 <div>
                   <h3 className="font-semibold mb-1">BMW M4 F82</h3>
                   <p className="text-xs text-gray-400">
-                    This work is based on "BMW M4 f82" (https://sketchfab.com/3d-models/bmw-m4-f82-8e87379f40fd40dcac0a751e22c1a188) by Black Snow (https://sketchfab.com/BlackSnow02) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+                    This work is based on &quot;BMW M4 f82&quot; (https://sketchfab.com/3d-models/bmw-m4-f82-8e87379f40fd40dcac0a751e22c1a188) by Black Snow (https://sketchfab.com/BlackSnow02) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
                   </p>
                 </div>
                 
                 <div>
                   <h3 className="font-semibold mb-1">BMW M8 F92</h3>
                   <p className="text-xs text-gray-400">
-                    This work is based on "BMW M8 F92 Coupé Competition" (https://sketchfab.com/3d-models/bmw-m8-f92-coupe-competition-25d5b4f6d13e4217afa09bbf89f8d993) by kevin (ケビン) (https://sketchfab.com/sohyalebret) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+                    This work is based on &quot;BMW M8 F92 Coupé Competition&quot; (https://sketchfab.com/3d-models/bmw-m8-f92-coupe-competition-25d5b4f6d13e4217afa09bbf89f8d993) by kevin (ケビン) (https://sketchfab.com/sohyalebret) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
                   </p>
                 </div>
                 
                 <div>
                   <h3 className="font-semibold mb-1">Mercedes-AMG C 63 Coupe S (W205)</h3>
                   <p className="text-xs text-gray-400">
-                    This work is based on "Mercedes-AMG C 63 Coupe S (W205)" (https://sketchfab.com/3d-models/mercedes-amg-c-63-coupe-s-w205-c8f54d07a4ca451ebc4a15f27a4230c3) by GT Cars: Hyperspeed (https://sketchfab.com/Car2022) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+                    This work is based on &quot;Mercedes-AMG C 63 Coupe S (W205)&quot; (https://sketchfab.com/3d-models/mercedes-amg-c-63-coupe-s-w205-c8f54d07a4ca451ebc4a15f27a4230c3) by GT Cars: Hyperspeed (https://sketchfab.com/Car2022) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
                   </p>
                 </div>
                 
                 <div>
                   <h3 className="font-semibold mb-1">Nissan GT-R R35 Nismo</h3>
                   <p className="text-xs text-gray-400">
-                    This work is based on "Nissan GT-R R35 Nismo | www.vecarz.com" (https://sketchfab.com/3d-models/nissan-gt-r-r35-nismo-wwwvecarzcom-9cfbe4727b7f4af0a11772687c4a1f59) by vecarz (https://sketchfab.com/heynic) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+                    This work is based on &quot;Nissan GT-R R35 Nismo | www.vecarz.com&quot; (https://sketchfab.com/3d-models/nissan-gt-r-r35-nismo-wwwvecarzcom-9cfbe4727b7f4af0a11772687c4a1f59) by vecarz (https://sketchfab.com/heynic) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
                   </p>
                 </div>
                 
                 <div>
                   <h3 className="font-semibold mb-1">Toyota GR Supra</h3>
                   <p className="text-xs text-gray-400">
-                    This work is based on "Toyota GR Supra" (https://sketchfab.com/3d-models/toyota-gr-supra-4e5b4f6d13e4217afa09bbf89f8d993) by Toyota (https://sketchfab.com/Toyota) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+                    This work is based on &quot;Toyota GR Supra&quot; (https://sketchfab.com/3d-models/toyota-gr-supra-4e5b4f6d13e4217afa09bbf89f8d993) by Toyota (https://sketchfab.com/Toyota) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
                   </p>
                 </div>
                 
@@ -635,7 +609,6 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
         {/* 3D Viewer */}
         <div className="absolute inset-0">
           <Canvas 
-            key={`canvas-${canvasKey}-${selectedModel}`}
             shadows 
             camera={{ position: [15, 5, 15], fov: isMobile ? 65 : 50 }}
             gl={{ 
@@ -866,7 +839,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                           ]}
                           selectedColor={bodyColor || originalColors.body || '#CCCCCC'}
                           onChange={setBodyColor}
-                          onCustomColor={() => handleCustomColor(setBodyColor)}
+                          onCustomColor={handleCustomColor}
                           effect="metallic"
                         />
                       </ConfigSection>
@@ -888,7 +861,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                           ]}
                           selectedColor={wheelColor || originalColors.wheel || '#333333'}
                           onChange={setWheelColor}
-                          onCustomColor={() => handleCustomColor(setWheelColor)}
+                          onCustomColor={handleCustomColor}
                           effect="metallic"
                         />
                       </ConfigSection>
@@ -912,7 +885,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                           ]}
                           selectedColor={drlColor}
                           onChange={setDrlColor}
-                          onCustomColor={() => handleCustomColor(setDrlColor)}
+                          onCustomColor={handleCustomColor}
                           effect="glow"
                         />
                       </ConfigSection>
@@ -935,7 +908,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                           ]}
                           selectedColor={interiorMainColor || originalColors.interiorMain || '#000000'}
                           onChange={setInteriorMainColor}
-                          onCustomColor={() => handleCustomColor(setInteriorMainColor)}
+                          onCustomColor={handleCustomColor}
                           effect="leather"
                         />
                       </ConfigSection>
@@ -957,7 +930,7 @@ export default function Configurator({ initialBrand, initialModel }: Configurato
                           ]}
                           selectedColor={interiorSecondaryColor || originalColors.interiorSecondary || '#333333'}
                           onChange={setInteriorSecondaryColor}
-                          onCustomColor={() => handleCustomColor(setInteriorSecondaryColor)}
+                          onCustomColor={handleCustomColor}
                           effect="leather"
                         />
                       </ConfigSection>

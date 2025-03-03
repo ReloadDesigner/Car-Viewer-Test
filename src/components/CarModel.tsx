@@ -72,7 +72,7 @@ export default function CarModel({
   const groupRef = useRef<THREE.Group>(null)
   const { camera } = useThree()
   const [isInitialRender, setIsInitialRender] = useState(true)
-  const [modelLoaded, setModelLoaded] = useState(false);
+  // Removed unused state
 
   const drlUniforms = useMemo(() => {
     return {
@@ -82,7 +82,7 @@ export default function CarModel({
   }, [drlColor])
 
   useEffect(() => {
-    let originalColors: {
+    const originalColors: {
       body: string | null;
       wheel: string | null;
       drl: string;
@@ -102,7 +102,7 @@ export default function CarModel({
       if (child instanceof THREE.Mesh) {
         if (child.material) {
           if (Array.isArray(child.material)) {
-            child.material.forEach((mat, index) => {
+            child.material.forEach(() => {
             });
           } else {
           }
@@ -160,7 +160,6 @@ export default function CarModel({
 
     setOriginalColors(originalColors)
     setIsInitialRender(false)
-    setModelLoaded(true);
   }, [scene, setOriginalColors, config])
 
   useEffect(() => {
